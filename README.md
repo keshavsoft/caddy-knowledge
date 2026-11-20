@@ -10,10 +10,10 @@
 
 ---
 
-## 📖 Live Master Handbook
+## 📖 Live Master Handbook & Runbooks
 
-Read the full interactive visual handbook with search, dark/light theme, and scroll-spy navigation:  
-👉 **[https://keshavsoft.github.io/caddy-knowledge/](https://keshavsoft.github.io/caddy-knowledge/)**
+- 🌐 **Master Handbook**: [https://keshavsoft.github.io/caddy-knowledge/](https://keshavsoft.github.io/caddy-knowledge/)
+- 🚀 **Operator Runbook (call.keshavsoft.com)**: [subdomain-to-fileserver-runbook.html](subdomain-to-fileserver-runbook.html) — Step-by-step instructions to inspect Caddy JSON and establish a static file server.
 
 ---
 

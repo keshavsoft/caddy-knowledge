@@ -446,6 +446,7 @@
 
       <div class="sidebar-section-title">Decision Guides & Ground Truth</div>
       <ul class="sidebar-nav">
+        <li><a href="subdomain-to-fileserver-runbook.html" style="color: var(--primary); font-weight: 700;">🚀 Step-by-Step Operator Runbook</a></li>
         <li><a href="#decision-matrix">⚡ Quick Decision Matrix</a></li>
         <li><a href="#ast-anatomy">🔍 Caddy JSON Route AST Anatomy</a></li>
         <li><a href="#fleet-ground-truth">🖥️ KeshavSoft Production Server</a></li>
@@ -461,6 +462,22 @@
       <p class="lead">
         The permanent, plain-English architectural reference for cloud ingress, automatic HTTPS, subdomains, reverse proxies, and static file servers on the KeshavSoft Ubuntu VPS fleet.
       </p>
+
+      <!-- Runbook Banner -->
+      <div class="card" style="border: 2px solid var(--primary); background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(129, 140, 248, 0.08));">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 0.25rem;">Live VPS Operator Task</div>
+            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.15rem;">Promoting <code>call.keshavsoft.com</code> from (no handler) to Static File Server</h3>
+            <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
+              Step-by-step interactive instructions with copy-ready commands to inspect Caddy JSON and establish <code>/usr/share/call.keshavsoft.com</code>.
+            </p>
+          </div>
+          <a href="subdomain-to-fileserver-runbook.html" style="background: var(--primary); color: #030712; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 0.9rem; display: inline-block;">
+            Open Runbook ➔
+          </a>
+        </div>
+      </div>
 
       <!-- ============================================================ -->
       <!-- SECTION 0: THE COLD-START MENTAL MODEL                       -->
