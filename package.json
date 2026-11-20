@@ -1,0 +1,31 @@
+{
+  "name": "caddy-knowledge",
+  "version": "1.0.0",
+  "description": "The Master Handbook & Knowledge Base for the KeshavSoft Caddy Suite: Ingress, Reverse Proxies, Subdomains, Static Hosting, and Zero-Downtime Operations.",
+  "homepage": "https://keshavsoft.github.io/caddy-knowledge/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keshavsoft/caddy-knowledge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/keshavsoft/caddy-knowledge/issues"
+  },
+  "license": "ISC",
+  "author": "KeshavSoft",
+  "type": "module",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "keywords": [
+    "caddy",
+    "caddy-server",
+    "caddy-knowledge",
+    "caddy-cli",
+    "caddy-subdomain",
+    "caddy-fileserver",
+    "caddy-template",
+    "vps-hosting",
+    "handbook",
+    "keshavsoft"
+  ]
+}
