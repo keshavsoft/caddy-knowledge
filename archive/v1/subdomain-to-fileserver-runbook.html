@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operator Runbook: Promoting call.keshavsoft.com to Static File Server</title>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --card-hover: #1e293b;
+      --text: #f3f4f6;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.18);
+      --secondary: #818cf8;
+      --accent: #34d399;
+      --teal: #14b8a6;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --code-bg: #030712;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --card-hover: #f1f5f9;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #0284c7;
+      --primary-glow: rgba(2, 132, 199, 0.12);
+      --secondary: #6366f1;
+      --accent: #059669;
+      --teal: #0d9488;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --code-bg: #0f172a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      padding: 2rem 1.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .badge-suite {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      background: var(--primary-glow);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #ffffff 30%, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    [data-theme="light"] h1 {
+      background: linear-gradient(135deg, #0f172a 30%, var(--primary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .theme-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
+    }
+    .theme-btn:hover {
+      border-color: var(--primary);
+    }
+
+    /* Scenario Box */
+    .scenario-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-left: 4px solid var(--warning);
+      padding: 1.25rem 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2.5rem;
+    }
+    .scenario-box h3 {
+      color: var(--warning);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Steps */
+    .step-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .step-num {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #030712;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+    }
+
+    .step-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    /* Code Blocks */
+    .terminal-container {
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+
+    .terminal-header {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 0.5rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .terminal-body {
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      overflow-x: auto;
+      line-height: 1.6;
+    }
+
+    .command-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(56, 189, 248, 0.08);
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      border-left: 3px solid var(--primary);
+      margin: 0.5rem 0 1rem 0;
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+    }
+
+    .command-text {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .copy-btn:hover {
+      background: var(--primary);
+      color: #030712;
+      border-color: var(--primary);
+    }
+
+    /* Comparison Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--card-border);
+      text-align: left;
+    }
+    th {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .status-warning { background: rgba(251, 191, 36, 0.15); color: var(--warning); }
+    .status-success { background: rgba(52, 211, 153, 0.15); color: var(--accent); }
+
+    /* Checklist */
+    .checklist {
+      list-style: none;
+      margin: 1rem 0;
+    }
+    .checklist li {
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .checklist li::before {
+      content: "✔";
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--card-border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div>
+      <div class="badge-suite">KeshavSoft VPS Operations Runbook</div>
+      <h1>Subdomain Promotion Guide</h1>
+      <p class="subtitle">Turning <code>call.keshavsoft.com</code> from <strong>(no handler)</strong> into a live <strong>Static File Server</strong></p>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()">🌓 Toggle Theme</button>
+  </header>
+
+  <!-- Scenario Box -->
+  <div class="scenario-box">
+    <h3>🎯 Your Current Problem Statement</h3>
+    <p>
+      You are connected via SSH to <code>root@Server6358:~#</code>. You ran <code>npx caddy-cli</code> and found:
+    </p>
+    <div class="terminal-container" style="margin: 0.75rem 0;">
+      <div class="terminal-body" style="color: #94a3b8;">
+(index) | Host                  | Type           | Upstream / Target | Path<br>
+...<br>
+11      | 'call.keshavsoft.com' | <strong>'(no handler)'</strong> | '-'               | '*'
+      </div>
+    </div>
+    <p>
+      <strong>Your Goal:</strong> You want to know what is currently inside Caddy JSON for <code>call.keshavsoft.com</code>, and then run a command to establish a full static file server on Ubuntu with zero downtime.
+    </p>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Inspect What is Currently Inside Caddy JSON</div>
+    </div>
+    <p>
+      To see the raw configuration that Caddy currently holds for <code>call.keshavsoft.com</code>, run this inspection command on your VPS:
+    </p>
+    <div class="command-line">
+      <span class="command-text" id="cmd1">npx caddy-cli -d call.keshavsoft.com</span>
+      <button class="copy-btn" onclick="copyText('cmd1')">📋 Copy</button>
+    </div>
+    <p style="color: var(--text-muted); font-size: 0.9rem;">
+      <em>Alternative:</em> You can also run <code>npx caddy-subdomain check call.keshavsoft.com</code>.
+    </p>
+
+    <div class="terminal-container">
+      <div class="terminal-header">
+        <span>EXPECTED OUTPUT</span>
+        <span>JSON AST Route</span>
+      </div>
+      <div class="terminal-body">
+======================================================<br>
+ Caddy Route Configuration: call.keshavsoft.com<br>
+ Server: srv0 | Route Index: 11<br>
+ Hostnames: call.keshavsoft.com<br>
+======================================================<br>
+<br>
+Type: (no handler) | Target: - | Path: *<br>
+<br>
+Raw Route JSON Definition:<br>
+{<br>
+&nbsp;&nbsp;"match": [{ "host": ["call.keshavsoft.com"] }],<br>
+&nbsp;&nbsp;"terminal": true<br>
+}
+      </div>
+    </div>
+    <p style="font-size: 0.9rem;">
+      💡 <strong>Why does it say "(no handler)"?</strong><br>
+      This domain is in <strong>Stage 1 (Flight Check)</strong>. Let's Encrypt has already issued your SSL certificate, but there is no file server or Node backend attached yet.
+    </p>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">The Execution: Establish the File Server</div>
+    </div>
+    <p>
+      To turn this domain into a production static site, execute this single atomic command on your VPS:
+    </p>
+    <div class="command-line">
+      <span class="command-text" id="cmd2">npx caddy-fileserver init call.keshavsoft.com</span>
+      <button class="copy-btn" onclick="copyText('cmd2')">📋 Copy</button>
+    </div>
+
+    <h4 style="margin: 1.25rem 0 0.5rem 0; font-size: 0.95rem; color: var(--primary);">⚡ What This Command Automatically Executes in 2 Seconds:</h4>
+    <ul class="checklist">
+      <li><strong>Ubuntu Filesystem:</strong> Creates directory <code>/usr/share/call.keshavsoft.com/</code></li>
+      <li><strong>Starter Assets:</strong> Generates and writes responsive starter <code>index.html</code> & <code>sitemap.xml</code></li>
+      <li><strong>Caddy Ingress Route:</strong> Injects Caddy handlers <code>vars.root</code> and <code>file_server</code> into <code>/etc/caddy/caddy.json</code></li>
+      <li><strong>Automatic Backup:</strong> Retains snapshot <code>/etc/caddy/caddy.json.bak.&lt;timestamp&gt;</code> for rollback</li>
+      <li><strong>Hot-Reload:</strong> Executes <code>caddy reload --config /etc/caddy/caddy.json</code> (zero connection drops)</li>
+      <li><strong>Live HTTPS Verification:</strong> Probes <code>https://call.keshavsoft.com</code> and confirms HTTP 200 OK</li>
+    </ul>
+
+    <div class="terminal-container">
+      <div class="terminal-header">
+        <span>TERMINAL FEEDBACK</span>
+        <span>caddy-fileserver init</span>
+      </div>
+      <div class="terminal-body" style="color: var(--accent);">
+============================================================<br>
+✅ Static File Server Initialized Successfully!<br>
+============================================================<br>
+Subdomain:        call.keshavsoft.com<br>
+Document Root:    /usr/share/call.keshavsoft.com<br>
+Files Created:    index.html, sitemap.xml<br>
+Caddy Config:     /etc/caddy/caddy.json<br>
+Route Index:      11<br>
+Backup File:      /etc/caddy/caddy.json.bak.1795185900000<br>
+Caddy Reload:     Success<br>
+Live HTTPS:       Yes (200 OK - Verified)<br>
+============================================================
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Verification & Audit</div>
+    </div>
+    <p>
+      Now verify that both Caddy Ingress and Ubuntu Filesystem are in 100% agreement:
+    </p>
+
+    <h4 style="margin: 1rem 0 0.5rem 0; font-size: 0.95rem;">A. Verify Fleet Table:</h4>
+    <div class="command-line">
+      <span class="command-text" id="cmd3">npx caddy-cli</span>
+      <button class="copy-btn" onclick="copyText('cmd3')">📋 Copy</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Host</th>
+          <th>Type</th>
+          <th>Upstream / Target</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>call.keshavsoft.com</code> (Before)</td>
+          <td><code>(no handler)</code></td>
+          <td><code>-</code></td>
+          <td><span class="status-badge status-warning">Probe Only</span></td>
+        </tr>
+        <tr>
+          <td><strong><code>call.keshavsoft.com</code> (Now)</strong></td>
+          <td><strong style="color: var(--teal);">file_server</strong></td>
+          <td><strong style="color: var(--teal);">/usr/share/call.keshavsoft.com</strong></td>
+          <td><span class="status-badge status-success">Live & Active</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4 style="margin: 1.5rem 0 0.5rem 0; font-size: 0.95rem;">B. Deep Audit (Disk + Caddy Alignment):</h4>
+    <div class="command-line">
+      <span class="command-text" id="cmd4">npx caddy-fileserver check call.keshavsoft.com</span>
+      <button class="copy-btn" onclick="copyText('cmd4')">📋 Copy</button>
+    </div>
+
+    <h4 style="margin: 1.5rem 0 0.5rem 0; font-size: 0.95rem;">C. Live Browser Check:</h4>
+    <p>
+      Open your browser and navigate to:  
+      👉 <a href="https://call.keshavsoft.com" target="_blank" style="color: var(--primary); font-weight: bold;">https://call.keshavsoft.com</a>
+    </p>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-card">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">Deploying Your Real Content</div>
+    </div>
+    <p>
+      Now that the static file server is active, anytime you want to update your website or upload your React / Vue / Vite build:
+    </p>
+    <div class="terminal-container">
+      <div class="terminal-header">
+        <span>UBUNTU BASH</span>
+        <span>Updating Static Site</span>
+      </div>
+      <div class="terminal-body">
+# 1. Edit the starter page directly:<br>
+nano /usr/share/call.keshavsoft.com/index.html<br>
+<br>
+# 2. Or copy your dist/ folder from a repo build:<br>
+cp -r ./dist/* /usr/share/call.keshavsoft.com/<br>
+<br>
+# Zero reloads required! Caddy serves disk changes instantly.
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    KeshavSoft Caddy Suite &bull; Ubuntu VPS Fleet Operations &bull; <code>caddy-knowledge</code>
+  </footer>
+
+  <script>
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+    }
+
+    function copyText(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const original = btn.innerText;
+        btn.innerText = "✅ Copied!";
+        setTimeout(() => { btn.innerText = original; }, 1800);
+      });
+    }
+  </script>
+</body>
+</html>
