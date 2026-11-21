@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operator Runbooks & Ground Truth — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="../02-caddy-internals/index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="../02-caddy-internals/json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="../02-caddy-internals/reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="../02-caddy-internals/static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="../02-caddy-internals/admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="../03-the-toolchain/index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="../03-the-toolchain/caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="../03-the-toolchain/caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="../03-the-toolchain/caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="../03-the-toolchain/caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="../04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="../04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="../04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="../04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="../04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html" class="active">📋 Runbook Index</a></li>
+        <li><a href="subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <span>05 Operator Runbooks</span> &rsaquo;
+        <span class="current">Runbook Index</span>
+      </div>
+
+      <h1>Operator Runbooks & Ground Truth</h1>
+      <p class="lead">
+        Step-by-step interactive operational runbooks with copy-ready commands for everyday fleet management, domain promotion, disaster recovery, and emergency troubleshooting.
+      </p>
+
+      <h2><span>📋</span> Available Runbooks</h2>
+
+      <div class="grid-3">
+        <a href="subdomain-to-fileserver.html" class="card card-interactive" style="text-decoration:none; color:inherit;">
+          <span class="badge badge-primary" style="margin-bottom:0.5rem;">Live VPS Task</span>
+          <h3 style="color:var(--text); margin:0 0 0.5rem;">Promote call.keshavsoft.com &rarr;</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted);">
+            Step-by-step instructions to inspect Caddy JSON, create <code>/usr/share/call.keshavsoft.com</code>, and establish static file serving.
+          </p>
+        </a>
+
+        <a href="disaster-recovery-backups.html" class="card card-interactive" style="text-decoration:none; color:inherit;">
+          <span class="badge badge-accent" style="margin-bottom:0.5rem;">Safety Standard</span>
+          <h3 style="color:var(--text); margin:0 0 0.5rem;">Atomic Backups & Rollback &rarr;</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted);">
+            How timestamped backups are automatically created, and how to execute an instant 2-second rollback if a mutation fails.
+          </p>
+        </a>
+
+        <a href="troubleshooting-502-and-ports.html" class="card card-interactive" style="text-decoration:none; color:inherit;">
+          <span class="badge badge-danger" style="margin-bottom:0.5rem;">Emergency Guide</span>
+          <h3 style="color:var(--text); margin:0 0 0.5rem;">502 Bad Gateway & Ports &rarr;</h3>
+          <p style="font-size:0.85rem; color:var(--text-muted);">
+            Diagnosing internal backend crashes, port collisions, and DNS propagation delays without breaking server state.
+          </p>
+        </a>
+      </div>
+
+      <div class="doc-footer-nav">
+        <a href="../04-lifecycle-and-models/case-study-appointment.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">Case Study: appointment-notifier</span>
+        </a>
+        <a href="subdomain-to-fileserver.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">Promote call.keshavsoft.com</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

@@ -5,411 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Caddy Knowledge Base — The Master KeshavSoft Ingress Handbook</title>
   <meta name="description" content="The definitive plain-English handbook for the KeshavSoft Caddy Suite: caddy-cli, caddy-subdomain, caddy-fileserver, and caddy-template on Ubuntu VPS.">
+  <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
-  <style>
-    :root {
-      --bg: #0b0f19;
-      --card-bg: #111827;
-      --card-border: #1f2937;
-      --card-hover: #1e293b;
-      --text: #f3f4f6;
-      --text-muted: #94a3b8;
-      --primary: #38bdf8;
-      --primary-glow: rgba(56, 189, 248, 0.18);
-      --secondary: #818cf8;
-      --accent: #34d399;
-      --teal: #14b8a6;
-      --warning: #fbbf24;
-      --danger: #f87171;
-      --code-bg: #030712;
-      --sidebar-bg: #070b14;
-      --header-bg: rgba(11, 15, 25, 0.88);
-      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    }
-
-    [data-theme="light"] {
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --card-border: #e2e8f0;
-      --card-hover: #f1f5f9;
-      --text: #0f172a;
-      --text-muted: #64748b;
-      --primary: #0284c7;
-      --primary-glow: rgba(2, 132, 199, 0.12);
-      --secondary: #6366f1;
-      --accent: #059669;
-      --teal: #0d9488;
-      --warning: #d97706;
-      --danger: #dc2626;
-      --code-bg: #0f172a;
-      --sidebar-bg: #f1f5f9;
-      --header-bg: rgba(248, 250, 252, 0.88);
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-      line-height: 1.65;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: background-color 0.2s ease, color 0.2s ease;
-    }
-
-    /* Header */
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: var(--header-bg);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--card-border);
-      padding: 0.75rem 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      text-decoration: none;
-      color: inherit;
-    }
-
-    .brand-icon {
-      font-size: 1.5rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      padding: 0.35rem 0.5rem;
-      border-radius: 8px;
-      color: #030712;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .brand-title {
-      font-size: 1.1rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-badge {
-      font-size: 0.7rem;
-      font-family: var(--font-mono);
-      background: var(--primary-glow);
-      color: var(--primary);
-      border: 1px solid var(--primary);
-      padding: 0.15rem 0.45rem;
-      border-radius: 999px;
-      font-weight: 600;
-      text-transform: uppercase;
-      margin-left: 0.4rem;
-    }
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .search-input {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      color: var(--text);
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      width: 180px;
-      outline: none;
-      transition: all 0.2s;
-    }
-    .search-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px var(--primary-glow);
-      width: 240px;
-    }
-
-    .theme-toggle, .btn-link {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 0.45rem 0.75rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      text-decoration: none;
-      font-family: var(--font-mono);
-      transition: all 0.2s;
-    }
-    .theme-toggle:hover, .btn-link:hover {
-      color: var(--text);
-      border-color: var(--primary);
-    }
-
-    /* Layout */
-    .container {
-      display: flex;
-      flex: 1;
-      max-width: 1500px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    /* Sidebar Navigation */
-    aside.sidebar {
-      width: 300px;
-      border-right: 1px solid var(--card-border);
-      padding: 1.5rem 1rem;
-      position: sticky;
-      top: 60px;
-      height: calc(100vh - 60px);
-      overflow-y: auto;
-      background: var(--sidebar-bg);
-      flex-shrink: 0;
-    }
-
-    .sidebar-section-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin: 1.25rem 0 0.5rem 0.5rem;
-    }
-
-    .sidebar-nav {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-    }
-
-    .sidebar-nav a {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.45rem 0.65rem;
-      border-radius: 6px;
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.88rem;
-      transition: all 0.15s;
-    }
-    .sidebar-nav a:hover {
-      color: var(--text);
-      background: var(--card-bg);
-    }
-    .sidebar-nav a.active {
-      color: var(--primary);
-      background: var(--primary-glow);
-      font-weight: 600;
-    }
-
-    /* Main Content */
-    main.content {
-      flex: 1;
-      padding: 2.5rem 3rem 5rem;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    h1, h2, h3, h4 {
-      color: var(--text);
-      letter-spacing: -0.02em;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 900;
-      margin-bottom: 0.75rem;
-      line-height: 1.2;
-    }
-
-    p.lead {
-      font-size: 1.15rem;
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-      line-height: 1.6;
-    }
-
-    h2 {
-      font-size: 1.65rem;
-      font-weight: 800;
-      margin: 3rem 0 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 1px solid var(--card-border);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    h3 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin: 1.75rem 0 0.75rem;
-    }
-
-    p { margin-bottom: 1.2rem; }
-
-    /* Cards */
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .card:hover {
-      border-color: var(--card-hover);
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 2rem;
-    }
-
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    /* Badges */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      padding: 0.2rem 0.5rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-family: var(--font-mono);
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-    .badge-primary { background: var(--primary-glow); color: var(--primary); border: 1px solid var(--primary); }
-    .badge-teal { background: rgba(20, 184, 166, 0.15); color: var(--teal); border: 1px solid var(--teal); }
-    .badge-accent { background: rgba(52, 211, 153, 0.15); color: var(--accent); border: 1px solid var(--accent); }
-    .badge-warning { background: rgba(251, 191, 36, 0.15); color: var(--warning); border: 1px solid var(--warning); }
-
-    /* Code Blocks */
-    pre {
-      background: var(--code-bg);
-      color: #e2e8f0;
-      padding: 1.2rem;
-      border-radius: 8px;
-      border: 1px solid var(--card-border);
-      font-family: var(--font-mono);
-      font-size: 0.88rem;
-      line-height: 1.55;
-      overflow-x: auto;
-      margin-bottom: 1.25rem;
-      position: relative;
-    }
-
-    code {
-      font-family: var(--font-mono);
-      font-size: 0.9em;
-      background: rgba(148, 163, 184, 0.12);
-      color: var(--primary);
-      padding: 0.15rem 0.35rem;
-      border-radius: 4px;
-    }
-    pre code {
-      background: transparent;
-      padding: 0;
-      color: inherit;
-    }
-
-    .copy-btn {
-      position: absolute;
-      top: 0.6rem;
-      right: 0.6rem;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: var(--text-muted);
-      border-radius: 4px;
-      padding: 0.25rem 0.55rem;
-      font-size: 0.75rem;
-      cursor: pointer;
-      font-family: var(--font-mono);
-      transition: all 0.15s;
-    }
-    .copy-btn:hover {
-      color: #fff;
-      background: rgba(255, 255, 255, 0.18);
-    }
-
-    /* Tables */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1.75rem;
-      font-size: 0.9rem;
-    }
-    th, td {
-      padding: 0.85rem 1rem;
-      text-align: left;
-      border-bottom: 1px solid var(--card-border);
-    }
-    th {
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--text);
-      font-weight: 700;
-      font-size: 0.82rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    tr:hover td {
-      background: rgba(255, 255, 255, 0.015);
-    }
-
-    /* Callouts */
-    .callout {
-      border-left: 4px solid var(--primary);
-      background: var(--card-bg);
-      padding: 1.2rem;
-      border-radius: 0 8px 8px 0;
-      margin-bottom: 1.5rem;
-    }
-    .callout-warning { border-left-color: var(--warning); }
-    .callout-accent { border-left-color: var(--accent); }
-    .callout-teal { border-left-color: var(--teal); }
-
-    /* Interactive Command Playground */
-    .playground-box {
-      background: linear-gradient(145deg, var(--card-bg), #060a12);
-      border: 1px solid var(--primary);
-      border-radius: 12px;
-      padding: 1.75rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 8px 24px var(--primary-glow);
-    }
-
-    /* Responsive */
-    @media (max-width: 900px) {
-      aside.sidebar { display: none; }
-      main.content { padding: 1.5rem; }
-      .search-input { width: 130px; }
-    }
-  </style>
 </head>
 <body>
 
   <!-- Top Navigation Header -->
   <header>
-    <a href="#" class="brand">
+    <a href="index.html" class="brand">
       <span class="brand-icon">🛡️</span>
       <div>
         <span class="brand-title">Caddy Knowledge Base</span>
@@ -420,7 +23,7 @@
     <div class="header-actions">
       <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
       <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
-      <a href="https://github.com/keshavsoft" target="_blank" class="btn-link">GitHub ↗</a>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
     </div>
   </header>
 
@@ -429,452 +32,343 @@
 
     <!-- Sticky Left Sidebar -->
     <aside class="sidebar">
-      <div class="sidebar-section-title">Core Mental Model</div>
+      <div class="sidebar-section-title">Overview</div>
       <ul class="sidebar-nav">
-        <li><a href="#cold-start" class="active">🧠 The Cold-Start Amensia Cure</a></li>
-        <li><a href="#maturity-model">🧭 3-Stage Subdomain Lifecycle</a></li>
-        <li><a href="#suite-overview">📦 The 4 Caddy Suite Repositories</a></li>
+        <li><a href="index.html" class="active">🏠 Knowledge Base Home</a></li>
       </ul>
 
-      <div class="sidebar-section-title">Component Deep-Dives</div>
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
       <ul class="sidebar-nav">
-        <li><a href="#caddy-subdomain">1️⃣ caddy-subdomain (Flight Check)</a></li>
-        <li><a href="#caddy-fileserver">2️⃣ caddy-fileserver (Static Server)</a></li>
-        <li><a href="#caddy-template">3️⃣ caddy-template (Route ASTs)</a></li>
-        <li><a href="#caddy-cli">4️⃣ caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
       </ul>
 
-      <div class="sidebar-section-title">Decision Guides & Ground Truth</div>
+      <div class="sidebar-section-title">02 Caddy Internals</div>
       <ul class="sidebar-nav">
-        <li><a href="subdomain-to-fileserver-runbook.html" style="color: var(--primary); font-weight: 700;">🚀 Step-by-Step Operator Runbook</a></li>
-        <li><a href="#decision-matrix">⚡ Quick Decision Matrix</a></li>
-        <li><a href="#ast-anatomy">🔍 Caddy JSON Route AST Anatomy</a></li>
-        <li><a href="#fleet-ground-truth">🖥️ KeshavSoft Production Server</a></li>
-        <li><a href="#troubleshooting">🛠️ Emergency Runbook &amp; Gotchas</a></li>
+        <li><a href="02-caddy-internals/index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="02-caddy-internals/json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="02-caddy-internals/reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="02-caddy-internals/static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="02-caddy-internals/admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="03-the-toolchain/index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="03-the-toolchain/caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="03-the-toolchain/caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="03-the-toolchain/caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="03-the-toolchain/caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
       </ul>
     </aside>
 
-    <!-- Main Content Stream -->
+    <!-- Main Content Body -->
     <main class="content">
 
-      <!-- Hero Header -->
       <h1>Caddy Suite Master Handbook</h1>
       <p class="lead">
         The permanent, plain-English architectural reference for cloud ingress, automatic HTTPS, subdomains, reverse proxies, and static file servers on the KeshavSoft Ubuntu VPS fleet.
       </p>
 
-      <!-- Runbook Banner -->
-      <div class="card" style="border: 2px solid var(--primary); background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(129, 140, 248, 0.08));">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-          <div>
-            <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 0.25rem;">Live VPS Operator Task</div>
-            <h3 style="margin: 0 0 0.5rem 0; font-size: 1.15rem;">Promoting <code>call.keshavsoft.com</code> from (no handler) to Static File Server</h3>
-            <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">
-              Step-by-step interactive instructions with copy-ready commands to inspect Caddy JSON and establish <code>/usr/share/call.keshavsoft.com</code>.
-            </p>
+      <!-- Upstream Authority Link Banner -->
+      <div class="upstream-banner">
+        <div class="upstream-banner-text">
+          <strong>Official Caddy Architecture:</strong> We link directly to official Caddy ground truth. The Caddyfile is an adapter; native JSON is the single source of truth.
+        </div>
+        <a href="https://caddyserver.com/docs/getting-started#the-caddyfile-is-an-adapter" target="_blank" class="upstream-banner-link">caddyserver.com/docs/getting-started ↗</a>
+      </div>
+
+      <!-- Quick Action Alert -->
+      <div class="card" style="border: 1px solid var(--primary); background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(129, 140, 248, 0.08));">
+        <div style="font-size:0.75rem; text-transform:uppercase; font-weight:700; color:var(--primary); font-family:var(--font-mono); margin-bottom:0.25rem;">Live VPS Operator Task</div>
+        <h3 style="margin: 0 0 0.5rem 0; font-size:1.15rem;">Promoting <code>call.keshavsoft.com</code> to Static File Server</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Step-by-step interactive instructions with copy-ready commands to inspect Caddy JSON and establish <code>/usr/share/call.keshavsoft.com</code>.
+        </p>
+        <a href="05-runbooks/subdomain-to-fileserver.html" style="background:var(--primary); color:#030712; padding:0.5rem 1rem; border-radius:6px; font-weight:700; text-decoration:none; font-size:0.88rem; display:inline-flex; align-items:center; gap:0.4rem;">Open Runbook &rarr;</a>
+      </div>
+
+      <!-- SECTION 1: THE CORE STORY & DUAL PARADIGMS -->
+      <h2><span>📖</span> The Story: The Two Paradigms of Caddy</h2>
+      <p>
+        To understand what we are doing with Caddy across our Ubuntu VPS fleet, you must understand the two ways Caddy operates:
+      </p>
+
+      <div class="grid-2">
+        <div class="card card-interactive">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <h3>1. The Caddyfile (Config-Driven)</h3>
+            <span class="badge badge-warning">Adapter Layer</span>
           </div>
-          <a href="subdomain-to-fileserver-runbook.html" style="background: var(--primary); color: #030712; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 0.9rem; display: inline-block;">
-            Open Runbook ➔
-          </a>
+          <p style="font-size:0.9rem; color:var(--text-muted);">
+            A text-based config adapter that most tutorials use. Great for single-site manual editing, but brittle for automation scripts, prone to syntax breakage, and cannot be dynamically inspected.
+          </p>
+          <a href="01-the-story/caddyfile-adapter.html" style="font-size:0.85rem; color:var(--primary); font-weight:600; text-decoration:none;">Read Caddyfile Limitations &rarr;</a>
+        </div>
+
+        <div class="card card-interactive">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <h3>2. Native Caddy JSON (JSON-Driven)</h3>
+            <span class="badge badge-accent">True Source of Truth</span>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted);">
+            Caddy’s canonical internal representation. Enables zero-downtime hot reloads in memory, drives Caddy's REST Admin API (<code>:2019</code>), and allows safe programmatic AST modifications.
+          </p>
+          <a href="01-the-story/native-json-paradigm.html" style="font-size:0.85rem; color:var(--accent); font-weight:600; text-decoration:none;">Read Native JSON Architecture &rarr;</a>
         </div>
       </div>
 
-      <!-- ============================================================ -->
-      <!-- SECTION 0: THE COLD-START MENTAL MODEL                       -->
-      <!-- ============================================================ -->
-      <section id="cold-start">
-        <h2><span>🧠</span> The Cold-Start Mental Model</h2>
-        <p>
-          Because reverse proxy and cloud ingress configurations are touched only once every few months, developers frequently suffer from <strong>cold-start amnesia</strong>:
-        </p>
-        <ul style="margin-left: 1.5rem; margin-bottom: 1.5rem; color: var(--text-muted);">
-          <li><em>"Did the connection fail because GoDaddy DNS hasn't propagated, or did Node.js crash?"</em></li>
-          <li><em>"Why did my Let's Encrypt certificate fail to issue?"</em></li>
-          <li><em>"Should I configure <code>reverse_proxy</code> to a port or <code>file_server</code> to <code>/usr/share</code>?"</em></li>
-          <li><em>"How do I add a new subdomain without breaking active client WebSockets?"</em></li>
-        </ul>
-        <p>
-          This knowledge base documents the exact conventions, tools, and JSON AST blueprints that power <strong>103.174.102.116</strong> so you can onboard new domains with 100% confidence.
-        </p>
-      </section>
-
-      <!-- ============================================================ -->
-      <!-- SECTION 1: 3-STAGE SUBDOMAIN MATURITY MODEL                  -->
-      <!-- ============================================================ -->
-      <section id="maturity-model">
-        <h2><span>🧭</span> The 3-Stage VPS Subdomain Maturity Model</h2>
-        <p>
-          Never configure DNS, Node.js ports, Caddy routes, and SSL simultaneously. KeshavSoft decouples hosting into three progressive verification stages:
-        </p>
-
-        <div class="grid-2">
-          
-          <div class="card" style="border-left: 4px solid var(--accent);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
-              <span class="badge badge-accent">Stage 1: Flight Check</span>
-              <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Zero Disk / Zero Code</span>
-            </div>
-            <h3>Smoke Probe (static_response 200 OK)</h3>
-            <p style="font-size: 0.9rem; color: var(--text-muted);">
-              Verifies that GoDaddy DNS reaches the server and Caddy provisions the Let's Encrypt certificate in memory. Does not touch disk folders or Node.js.
-            </p>
-            <pre><code>npx caddy-subdomain probe call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('npx caddy-subdomain probe call.keshavsoft.com', this)">Copy</button></pre>
-          </div>
-
-          <div class="card" style="border-left: 4px solid var(--teal);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
-              <span class="badge badge-teal">Stage 2: Static Server</span>
-              <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Real Disk I/O</span>
-            </div>
-            <h3>Static File Server (/usr/share/...)</h3>
-            <p style="font-size: 0.9rem; color: var(--text-muted);">
-              Provisions the Ubuntu directory, drops a responsive starter <code>index.html</code>, and configures Caddy's native <code>file_server</code> handler with auto-reload.
-            </p>
-            <pre><code>npx caddy-fileserver init call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('npx caddy-fileserver init call.keshavsoft.com', this)">Copy</button></pre>
-          </div>
-
+      <div class="callout callout-teal">
+        <div class="callout-title">Why We Built Tools on Native JSON</div>
+        Native JSON is ideal for machines and automation, but deeply nested and difficult for human operators to read and write without making bracket errors. To bridge this gap, KeshavSoft standardized on <code>/etc/caddy/caddy.json</code> and built a complete suite of four focused CLI tools.
+        <div style="margin-top:0.5rem;">
+          <a href="01-the-story/why-we-built-tools.html" style="color:var(--teal); font-weight:600; text-decoration:underline;">Read the Full Toolchain Evolution Story &rarr;</a>
         </div>
+      </div>
 
-        <div class="card" style="border-left: 4px solid var(--primary); margin-bottom: 2.5rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.5rem;">
-            <span class="badge badge-primary">Stage 3: Dynamic Application</span>
-            <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Full Backend Process</span>
-          </div>
-          <h3>Reverse Proxy to Node.js / Docker</h3>
-          <p style="font-size: 0.9rem; color: var(--text-muted);">
-            When the subdomain requires full server-side rendering or dynamic APIs, manage the process with <code>ubuntu-service-cli</code> and promote the Caddy route to forward traffic to the internal port (e.g. <code>localhost:5000</code>).
-          </p>
-          <pre><code>npx caddy-subdomain add call.keshavsoft.com 5000</code><button class="copy-btn" onclick="copyText('npx caddy-subdomain add call.keshavsoft.com 5000', this)">Copy</button></pre>
-        </div>
-      </section>
+      <!-- SECTION 2: THE 4 SUITE REPOSITORIES -->
+      <h2><span>📦</span> The 4 KeshavSoft Caddy Suite Repositories</h2>
+      <p>Each repository in the suite has a single, strictly defined responsibility:</p>
 
-      <!-- ============================================================ -->
-      <!-- SECTION 2: THE CADDY SUITE REPOSITORIES                      -->
-      <!-- ============================================================ -->
-      <section id="suite-overview">
-        <h2><span>📦</span> The 4 Caddy Suite Repositories</h2>
-        <p>Each repository in the suite has a single, strictly defined responsibility:</p>
-
-        <div class="grid-2">
-          
-          <div class="card">
+      <div class="grid-2">
+        <!-- 1. caddy-subdomain -->
+        <div class="card card-interactive">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
             <h3>1. <code>caddy-subdomain</code></h3>
-            <p style="font-size: 0.88rem; color: var(--text-muted);">
-              The atomic subdomain engine. Injects Level-1 smoke probes, verifies live HTTPS handshakes, and seamlessly promotes to reverse proxies or static paths with automated backups.
-            </p>
-            <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--primary);">
-              Commands: probe &bull; add &bull; static &bull; check &bull; list
-            </div>
+            <span class="badge badge-accent">Smoke Probes</span>
           </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Level-1 smoke test probe engine. Verifies GoDaddy DNS and Let's Encrypt TLS with an in-memory <code>static_response</code> handler before allocating backend ports.
+          </p>
+          <pre><code>npx caddy-subdomain probe call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('npx caddy-subdomain probe call.keshavsoft.com', this)">Copy</button></pre>
+          <div style="display:flex; gap:0.75rem; font-size:0.82rem;">
+            <a href="03-the-toolchain/caddy-subdomain.html" style="color:var(--primary); font-weight:600; text-decoration:none;">Handbook Chapter &rarr;</a>
+            <a href="https://github.com/keshavsoft/caddy-subdomain" target="_blank" style="color:var(--text-muted); text-decoration:none;">GitHub ↗</a>
+          </div>
+        </div>
 
-          <div class="card">
+        <!-- 2. caddy-fileserver -->
+        <div class="card card-interactive">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
             <h3>2. <code>caddy-fileserver</code></h3>
-            <p style="font-size: 0.88rem; color: var(--text-muted);">
-              The bridge between Caddy TLS (:443) and the Ubuntu filesystem. Automates <code>/usr/share/&lt;domain&gt;</code> provisioning, drops starter HTML/XML templates, and configures Caddy static routes.
-            </p>
-            <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--teal);">
-              Commands: init &bull; check &bull; template &bull; list
-            </div>
+            <span class="badge badge-teal">Filesystem Bridge</span>
           </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Bridges Caddy TLS (:443) to Ubuntu filesystem (<code>/usr/share/...</code>). Creates document roots, responsive starter HTML, and wires native <code>file_server</code> routes.
+          </p>
+          <pre><code>npx caddy-fileserver init call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('npx caddy-fileserver init call.keshavsoft.com', this)">Copy</button></pre>
+          <div style="display:flex; gap:0.75rem; font-size:0.82rem;">
+            <a href="03-the-toolchain/caddy-fileserver.html" style="color:var(--teal); font-weight:600; text-decoration:none;">Handbook Chapter &rarr;</a>
+            <a href="https://github.com/keshavsoft/caddy-fileserver" target="_blank" style="color:var(--text-muted); text-decoration:none;">GitHub ↗</a>
+          </div>
+        </div>
 
-          <div class="card">
+        <!-- 3. caddy-template -->
+        <div class="card card-interactive">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
             <h3>3. <code>caddy-template</code></h3>
-            <p style="font-size: 0.88rem; color: var(--text-muted);">
-              The pure AST blueprint generator. Returns battle-tested, validated Caddy JSON route objects for unified proxies, split WebSocket ports, static file servers, and multi-domain aliases.
-            </p>
-            <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--secondary);">
-              Templates: proxy &bull; ws-split &bull; static &bull; multi-host
-            </div>
+            <span class="badge badge-secondary">Route Blueprints</span>
           </div>
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+            Emits battle-tested Caddy JSON route AST blocks for reverse proxies (HTTP/WS), split WebSocket daemons, static sites, and multi-domain aliases.
+          </p>
+          <pre><code>npx caddy-template proxy appointment.keshavsoft.com 3000</code><button class="copy-btn" onclick="copyText('npx caddy-template proxy appointment.keshavsoft.com 3000', this)">Copy</button></pre>
+          <div style="display:flex; gap:0.75rem; font-size:0.82rem;">
+            <a href="03-the-toolchain/caddy-template.html" style="color:var(--secondary); font-weight:600; text-decoration:none;">Handbook Chapter &rarr;</a>
+            <a href="https://github.com/keshavsoft/caddy-template" target="_blank" style="color:var(--text-muted); text-decoration:none;">GitHub ↗</a>
+          </div>
+        </div>
 
-          <div class="card">
+        <!-- 4. caddy-cli -->
+        <div class="card card-interactive">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
             <h3>4. <code>caddy-cli</code></h3>
-            <p style="font-size: 0.88rem; color: var(--text-muted);">
-              The fleet orchestrator and inspection lens. Parses <code>/etc/caddy/caddy.json</code>, prints formatted port mapping tables, detects domain collisions, and safely appends routes.
-            </p>
-            <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--warning);">
-              Commands: inspect &bull; -p (ports) &bull; -d (domain) &bull; add
-            </div>
+            <span class="badge badge-primary">Fleet Observability</span>
           </div>
-
+          <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+            The Human Lens. Parses live <code>caddy.json</code> to display formatted tables of all active subdomains, upstream dial targets, and occupied ports.
+          </p>
+          <pre><code>npx caddy-cli -p</code><button class="copy-btn" onclick="copyText('npx caddy-cli -p', this)">Copy</button></pre>
+          <div style="display:flex; gap:0.75rem; font-size:0.82rem;">
+            <a href="03-the-toolchain/caddy-cli.html" style="color:var(--primary); font-weight:600; text-decoration:none;">Handbook Chapter &rarr;</a>
+            <a href="https://github.com/keshavsoft/caddy-cli" target="_blank" style="color:var(--text-muted); text-decoration:none;">GitHub ↗</a>
+          </div>
         </div>
-      </section>
+      </div>
 
-      <!-- ============================================================ -->
-      <!-- SECTION 3: DECISION MATRIX                                   -->
-      <!-- ============================================================ -->
-      <section id="decision-matrix">
-        <h2><span>⚡</span> Quick Decision Matrix</h2>
-        <p>Pick the right command for your current operational task:</p>
+      <!-- SECTION 3: THE 5 MODULAR CHAPTERS DIRECTORY -->
+      <h2><span>🗂️</span> Complete Modular Documentation Structure</h2>
+      <p>This knowledge base is organized into five dedicated architectural chapters:</p>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Goal / Scenario</th>
-              <th>Recommended Command</th>
-              <th>Underlying Handler</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>New domain created on GoDaddy:</strong> verify DNS &amp; SSL</td>
-              <td><code>npx caddy-subdomain probe call.keshavsoft.com</code></td>
-              <td><code>static_response (200 OK)</code></td>
-            </tr>
-            <tr>
-              <td><strong>Host static site / SPA / docs:</strong> folder + HTML + Caddy route</td>
-              <td><code>npx caddy-fileserver init call.keshavsoft.com</code></td>
-              <td><code>vars.root + file_server</code></td>
-            </tr>
-            <tr>
-              <td><strong>Unified Node/Express app:</strong> HTTP + WS on same port (e.g. 3000)</td>
-              <td><code>npx caddy-subdomain add appointment.keshavsoft.com 3000</code></td>
-              <td><code>reverse_proxy (dial: localhost:3000)</code></td>
-            </tr>
-            <tr>
-              <td><strong>Dual-port split engine:</strong> WS on :8080 and REST on :9011</td>
-              <td><code>npx caddy-cli add quotation.keshavsoft.com 9011 --ws 8080</code></td>
-              <td><code>subroute (/ws* ➔ :8080, * ➔ :9011)</code></td>
-            </tr>
-            <tr>
-              <td><strong>Apex + WWW aliases:</strong> both forward to same backend port</td>
-              <td><code>npx caddy-template multi-host keshavsoft.com,www.keshavsoft.com 9328</code></td>
-              <td><code>match.host: [domain1, domain2]</code></td>
-            </tr>
-            <tr>
-              <td><strong>Fleet Audit:</strong> view all ports, subdomains, and targets</td>
-              <td><code>npx caddy-cli -p</code></td>
-              <td>Route table parser</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+      <div class="grid-3">
+        <div class="card">
+          <div style="font-weight:700; color:var(--primary); margin-bottom:0.4rem;">01 The Story & Paradigms</div>
+          <ul style="margin-left:1.25rem; font-size:0.85rem; color:var(--text-muted); line-height:1.7;">
+            <li><a href="01-the-story/index.html" style="color:inherit;">The Dual Paradigms Overview</a></li>
+            <li><a href="01-the-story/caddyfile-adapter.html" style="color:inherit;">Caddyfile Adapter Limitations</a></li>
+            <li><a href="01-the-story/native-json-paradigm.html" style="color:inherit;">Native Caddy JSON Single Truth</a></li>
+            <li><a href="01-the-story/why-we-built-tools.html" style="color:inherit;">Why We Built Tools on JSON</a></li>
+          </ul>
+        </div>
 
-      <!-- ============================================================ -->
-      <!-- SECTION 4: ROUTE AST ANATOMY                                 -->
-      <!-- ============================================================ -->
-      <section id="ast-anatomy">
-        <h2><span>🔍</span> Caddy JSON Route AST Anatomy</h2>
-        <p>
-          Every route inside <code>apps.http.servers.srv0.routes</code> follows a strict object hierarchy:
+        <div class="card">
+          <div style="font-weight:700; color:var(--teal); margin-bottom:0.4rem;">02 Caddy Internals</div>
+          <ul style="margin-left:1.25rem; font-size:0.85rem; color:var(--text-muted); line-height:1.7;">
+            <li><a href="02-caddy-internals/index.html" style="color:inherit;">Upstream Architecture Map</a></li>
+            <li><a href="02-caddy-internals/json-ast-hierarchy.html" style="color:inherit;">JSON AST Route Anatomy</a></li>
+            <li><a href="02-caddy-internals/reverse-proxy-and-ws.html" style="color:inherit;">Reverse Proxy & WebSockets</a></li>
+            <li><a href="02-caddy-internals/static-fileserver.html" style="color:inherit;">Static File Server Handler</a></li>
+            <li><a href="02-caddy-internals/admin-api-and-reloads.html" style="color:inherit;">Hot Reloads vs Systemd</a></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:700; color:var(--secondary); margin-bottom:0.4rem;">03 The Toolchain</div>
+          <ul style="margin-left:1.25rem; font-size:0.85rem; color:var(--text-muted); line-height:1.7;">
+            <li><a href="03-the-toolchain/index.html" style="color:inherit;">Toolchain Synergy Overview</a></li>
+            <li><a href="03-the-toolchain/caddy-cli.html" style="color:inherit;">caddy-cli (Fleet Inspector)</a></li>
+            <li><a href="03-the-toolchain/caddy-template.html" style="color:inherit;">caddy-template (Route ASTs)</a></li>
+            <li><a href="03-the-toolchain/caddy-subdomain.html" style="color:inherit;">caddy-subdomain (Smoke Probes)</a></li>
+            <li><a href="03-the-toolchain/caddy-fileserver.html" style="color:inherit;">caddy-fileserver (Ubuntu Bridge)</a></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:700; color:var(--accent); margin-bottom:0.4rem;">04 Lifecycle & Models</div>
+          <ul style="margin-left:1.25rem; font-size:0.85rem; color:var(--text-muted); line-height:1.7;">
+            <li><a href="04-lifecycle-and-models/index.html" style="color:inherit;">3-Stage Maturity Model</a></li>
+            <li><a href="04-lifecycle-and-models/stage1-smoke-probe.html" style="color:inherit;">Stage 1: Smoke Probe</a></li>
+            <li><a href="04-lifecycle-and-models/stage2-static-fileserver.html" style="color:inherit;">Stage 2: Static File Server</a></li>
+            <li><a href="04-lifecycle-and-models/stage3-dynamic-backend.html" style="color:inherit;">Stage 3: Dynamic Node Backend</a></li>
+            <li><a href="04-lifecycle-and-models/case-study-appointment.html" style="color:inherit;">Case Study: appointment-notifier</a></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:700; color:var(--warning); margin-bottom:0.4rem;">05 Operator Runbooks</div>
+          <ul style="margin-left:1.25rem; font-size:0.85rem; color:var(--text-muted); line-height:1.7;">
+            <li><a href="05-runbooks/index.html" style="color:inherit;">Master Runbook Index</a></li>
+            <li><a href="05-runbooks/subdomain-to-fileserver.html" style="color:inherit;">Promote call.keshavsoft.com</a></li>
+            <li><a href="05-runbooks/disaster-recovery-backups.html" style="color:inherit;">Atomic Backups & Recovery</a></li>
+            <li><a href="05-runbooks/troubleshooting-502-and-ports.html" style="color:inherit;">502 Bad Gateway & Port Conflicts</a></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:700; color:var(--text); margin-bottom:0.4rem;">🌐 Ecosystem Portals</div>
+          <ul style="margin-left:1.25rem; font-size:0.85rem; color:var(--text-muted); line-height:1.7;">
+            <li><a href="https://keshavsoft.github.io/caddy-hosting/" target="_blank" style="color:inherit;">caddy-hosting (Gateway) ↗</a></li>
+            <li><a href="https://keshavsoft.github.io/caddy-template-knowledge/" target="_blank" style="color:inherit;">caddy-template-knowledge ↗</a></li>
+            <li><a href="https://github.com/keshavsoft/appointment-notifier" target="_blank" style="color:inherit;">appointment-notifier Repo ↗</a></li>
+            <li><a href="https://caddyserver.com/docs/" target="_blank" style="color:inherit;">Official Caddy Docs ↗</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SECTION 4: QUICK DECISION MATRIX -->
+      <h2><span>⚡</span> Quick Decision Matrix</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Goal / Scenario</th>
+            <th>Recommended Command</th>
+            <th>Underlying Caddy Handler</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Verify GoDaddy DNS & SSL</strong></td>
+            <td><code>npx caddy-subdomain probe &lt;domain&gt;</code></td>
+            <td><code>static_response (200 OK)</code></td>
+          </tr>
+          <tr>
+            <td><strong>Host static site / SPA / docs</strong></td>
+            <td><code>npx caddy-fileserver init &lt;domain&gt;</code></td>
+            <td><code>vars.root + file_server</code></td>
+          </tr>
+          <tr>
+            <td><strong>Unified Node/Express app (:3000)</strong></td>
+            <td><code>npx caddy-subdomain add &lt;domain&gt; 3000</code></td>
+            <td><code>reverse_proxy (dial: localhost:3000)</code></td>
+          </tr>
+          <tr>
+            <td><strong>Split WebSocket (:8080) & REST (:9011)</strong></td>
+            <td><code>npx caddy-template ws-split &lt;domain&gt; 9011 8080</code></td>
+            <td><code>subroute (/ws* &rarr; :8080, * &rarr; :9011)</code></td>
+          </tr>
+          <tr>
+            <td><strong>Apex + WWW aliases</strong></td>
+            <td><code>npx caddy-template multi-host domain.com,www.domain.com 9328</code></td>
+            <td><code>match.host: [domain1, domain2]</code></td>
+          </tr>
+          <tr>
+            <td><strong>Audit all ports on VPS</strong></td>
+            <td><code>npx caddy-cli -p</code></td>
+            <td>Formatted route table</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- SECTION 5: EMERGENCY RUNBOOK -->
+      <h2><span>🛠️</span> Emergency Runbook & Ground Truth</h2>
+
+      <div class="card">
+        <h3>1. 502 Bad Gateway</h3>
+        <p style="font-size:0.9rem; color:var(--text-muted);">
+          <strong>Cause:</strong> Caddy accepted traffic on port 443, but the internal backend process is not listening on the target port.
         </p>
-
-        <pre><code>{
-  "match": [
-    {
-      "host": ["call.keshavsoft.com"]   // 1. SNI / Host header match
-    }
-  ],
-  "handle": [
-    {
-      "handler": "subroute",            // 2. Encapsulates inner handler pipeline
-      "routes": [
-        {
-          "handle": [
-            {
-              "handler": "vars",        // 3A. Sets the document root on disk
-              "root": "/usr/share/call.keshavsoft.com"
-            },
-            {
-              "handler": "file_server", // 3B. High-speed static file server
-              "hide": ["/etc/caddy/Caddyfile"]
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "terminal": true                      // 4. Stops evaluation once matched
-}</code><button class="copy-btn" onclick="copyText(this.previousSibling.innerText, this)">Copy</button></pre>
-
-        <div class="callout callout-teal">
-          <strong>Why <code>terminal: true</code> is mandatory:</strong> Without <code>terminal: true</code>, Caddy continues evaluating subsequent routes in the array, potentially causing fallback handlers to overwrite your HTTP response.
-        </div>
-      </section>
-
-      <!-- ============================================================ -->
-      <!-- SECTION 5: KESHAVSOFT PRODUCTION GROUND TRUTH               -->
-      <!-- ============================================================ -->
-      <section id="fleet-ground-truth">
-        <h2><span>🖥️</span> KeshavSoft Production Server Ground Truth</h2>
-        <p>
-          The production VPS (<strong>103.174.102.116</strong>) hosts 11 active domains. Here is how each real service maps to its Caddy route and internal port:
+        <p style="font-size:0.9rem; color:var(--text-muted);">
+          <strong>Fix:</strong> Check if the backend is running with <code>curl http://localhost:&lt;port&gt;</code> or inspect systemd status.
         </p>
+      </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Domain</th>
-              <th>Handler Type</th>
-              <th>Target / Dial</th>
-              <th>Path Scope</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>quotation.keshavsoft.com</code></td>
-              <td><code>reverse_proxy</code></td>
-              <td><code>localhost:8080</code></td>
-              <td><code>/ws*</code> (WebSocket dial)</td>
-            </tr>
-            <tr>
-              <td><code>quotation.keshavsoft.com</code></td>
-              <td><code>reverse_proxy</code></td>
-              <td><code>localhost:9011</code></td>
-              <td><code>*</code> (REST API &amp; Web)</td>
-            </tr>
-            <tr>
-              <td><code>washtex5.keshavsoft.com</code></td>
-              <td><code>reverse_proxy</code></td>
-              <td><code>localhost:9328</code></td>
-              <td><code>*</code></td>
-            </tr>
-            <tr>
-              <td><code>mani3.keshavsoft.com</code></td>
-              <td><code>reverse_proxy</code></td>
-              <td><code>localhost:3025</code></td>
-              <td><code>*</code></td>
-            </tr>
-            <tr>
-              <td><code>lab14.keshavsoft.com</code></td>
-              <td><code>reverse_proxy</code></td>
-              <td><code>localhost:9012</code></td>
-              <td><code>*</code></td>
-            </tr>
-            <tr>
-              <td><code>rk2.keshavsoft.com</code></td>
-              <td><code>reverse_proxy</code></td>
-              <td><code>localhost:9010</code></td>
-              <td><code>*</code></td>
-            </tr>
-            <tr>
-              <td><code>keshavsoft.com</code></td>
-              <td><code>reverse_proxy</code></td>
-              <td><code>localhost:9328</code></td>
-              <td><code>*</code></td>
-            </tr>
-            <tr>
-              <td><code>www.keshavsoft.com</code></td>
-              <td><code>reverse_proxy</code></td>
-              <td><code>localhost:9328</code></td>
-              <td><code>*</code></td>
-            </tr>
-            <tr>
-              <td><code>cli.keshavsoft.com</code></td>
-              <td><code>file_server</code></td>
-              <td><code>/usr/share/cli.keshavsoft.com</code></td>
-              <td><code>*</code> (Static assets)</td>
-            </tr>
-            <tr>
-              <td><code>appointment.keshavsoft.com</code></td>
-              <td><code>reverse_proxy</code></td>
-              <td><code>localhost:3000</code></td>
-              <td><code>*</code> (Unified HTTP + WS)</td>
-            </tr>
-            <tr>
-              <td><code>call.keshavsoft.com</code></td>
-              <td><code>file_server</code></td>
-              <td><code>/usr/share/caddy/call.keshavsoft.com</code></td>
-              <td><code>*</code></td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
+      <div class="card">
+        <h3>2. Hot-Reload Without Dropping Active WebSockets</h3>
+        <p style="font-size:0.9rem; color:var(--text-muted);">
+          Never run <code>systemctl restart caddy</code>. Use in-memory reload:
+        </p>
+        <pre><code>caddy reload --config /etc/caddy/caddy.json</code><button class="copy-btn" onclick="copyText('caddy reload --config /etc/caddy/caddy.json', this)">Copy</button></pre>
+      </div>
 
-      <!-- ============================================================ -->
-      <!-- SECTION 6: EMERGENCY RUNBOOK & TROUBLESHOOTING               -->
-      <!-- ============================================================ -->
-      <section id="troubleshooting">
-        <h2><span>🛠️</span> Emergency Runbook &amp; Gotchas</h2>
+      <div class="card">
+        <h3>3. Immediate Rollback from Automatic Backups</h3>
+        <p style="font-size:0.9rem; color:var(--text-muted);">
+          Every mutation performed by our tools creates a timestamped backup:
+        </p>
+        <pre><code>cp $(ls -t /etc/caddy/caddy.json.bak.* | head -1) /etc/caddy/caddy.json
+caddy reload --config /etc/caddy/caddy.json</code><button class="copy-btn" onclick="copyText('cp $(ls -t /etc/caddy/caddy.json.bak.* | head -1) /etc/caddy/caddy.json\ncaddy reload --config /etc/caddy/caddy.json', this)">Copy</button></pre>
+      </div>
 
-        <div class="card callout-warning">
-          <h3>Issue 1: 502 Bad Gateway</h3>
-          <p style="font-size: 0.9rem;">
-            <strong>Root Cause:</strong> Caddy received public traffic on port 443, but the backend process is not listening on the internal target port (e.g. <code>localhost:3000</code>).
-          </p>
-          <p style="font-size: 0.9rem;">
-            <strong>Resolution:</strong> Use <code>npx ubuntu-service-cli check &lt;domain&gt;</code> to check if the systemd service is running, or verify with <code>curl http://localhost:3000</code>.
-          </p>
-        </div>
-
-        <div class="card callout-accent">
-          <h3>Issue 2: Hot-Reloading Without Dropping WebSockets</h3>
-          <p style="font-size: 0.9rem;">
-            Never restart the Caddy service via <code>systemctl restart caddy</code>. A restart kills active client WebSockets and TCP tunnels.
-          </p>
-          <pre><code># The Safe Hot-Reload Command (Preserves all active TLS handshakes):
-caddy reload --config /etc/caddy/caddy.json</code><button class="copy-btn" onclick="copyText('caddy reload --config /etc/caddy/caddy.json', this)">Copy</button></pre>
-        </div>
-
-        <div class="card callout-teal">
-          <h3>Issue 3: Rolling Back Configuration</h3>
-          <p style="font-size: 0.9rem;">
-            Every mutation performed by <code>caddy-subdomain</code>, <code>caddy-fileserver</code>, and <code>caddy-cli</code> automatically generates an atomic backup: <code>/etc/caddy/caddy.json.bak.&lt;timestamp&gt;</code>.
-          </p>
-          <pre><code># Restore from the latest backup:
-cp /etc/caddy/caddy.json.bak.&lt;timestamp&gt; /etc/caddy/caddy.json
-caddy reload --config /etc/caddy/caddy.json</code><button class="copy-btn" onclick="copyText('caddy reload --config /etc/caddy/caddy.json', this)">Copy</button></pre>
-        </div>
-
-      </section>
+      <div class="doc-footer-nav">
+        <div></div>
+        <a href="01-the-story/index.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Start Reading &rarr;</span>
+          <span class="title">01 The Story: Dual Paradigms</span>
+        </a>
+      </div>
 
     </main>
-
   </div>
 
-  <script>
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme');
-      const target = current === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', target);
-      localStorage.setItem('caddy-theme', target);
-    }
-
-    const savedTheme = localStorage.getItem('caddy-theme');
-    if (savedTheme) {
-      document.documentElement.setAttribute('data-theme', savedTheme);
-    }
-
-    function copyText(text, btn) {
-      navigator.clipboard.writeText(text);
-      const original = btn.innerText;
-      btn.innerText = 'Copied!';
-      btn.style.color = '#34d399';
-      setTimeout(() => {
-        btn.innerText = original;
-        btn.style.color = '';
-      }, 1500);
-    }
-
-    function filterContent(query) {
-      const q = query.toLowerCase().trim();
-      const sections = document.querySelectorAll('main.content section');
-      sections.forEach(sec => {
-        const text = sec.innerText.toLowerCase();
-        sec.style.display = text.includes(q) ? 'block' : 'none';
-      });
-    }
-
-    // Scroll Spy for sidebar links
-    window.addEventListener('scroll', () => {
-      const sections = document.querySelectorAll('main.content section');
-      const navLinks = document.querySelectorAll('.sidebar-nav a');
-      let currentSectionId = '';
-
-      sections.forEach(sec => {
-        const top = sec.offsetTop - 120;
-        if (window.scrollY >= top) {
-          currentSectionId = sec.getAttribute('id');
-        }
-      });
-
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${currentSectionId}`) {
-          link.classList.add('active');
-        }
-      });
-    });
-  </script>
+  <script src="js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>caddy-template: Production Route Blueprints — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="../02-caddy-internals/index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="../02-caddy-internals/json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="../02-caddy-internals/reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="../02-caddy-internals/static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="../02-caddy-internals/admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="caddy-template.html" class="active">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="../04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="../04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="../04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="../04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="../04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="../05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="../05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="../05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="../05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <a href="index.html">03 The Toolchain</a> &rsaquo;
+        <span class="current">caddy-template</span>
+      </div>
+
+      <h1>caddy-template: Battle-Tested Route Blueprints</h1>
+      <p class="lead">
+        <strong>The Route Blueprint Engine:</strong> Emits pristine, schema-compliant Caddy JSON route blocks for reverse proxies, WebSockets, static file servers, and multi-domain aliases.
+      </p>
+
+      <div class="upstream-banner">
+        <div class="upstream-banner-text">
+          <strong>Official Package & Repository:</strong> Published on npm and GitHub with live browser generator.
+        </div>
+        <div>
+          <a href="https://www.npmjs.com/package/caddy-template" target="_blank" class="upstream-banner-link">npm: caddy-template ↗</a> &bull;
+          <a href="https://github.com/keshavsoft/caddy-template" target="_blank" class="upstream-banner-link">github.com/keshavsoft/caddy-template ↗</a>
+        </div>
+      </div>
+
+      <h2><span>📐</span> The 4 Canonical Blueprints</h2>
+
+      <div class="grid-2">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>1. proxy</h3>
+            <span class="badge badge-primary">Unified Port</span>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted); margin-top:0.5rem;">
+            Standard reverse proxy for Node.js, Express, Go, or Python. Transparently tunnels WebSocket upgrades.
+          </p>
+          <pre><code>npx caddy-template proxy appointment.keshavsoft.com 3000</code><button class="copy-btn" onclick="copyText('npx caddy-template proxy appointment.keshavsoft.com 3000', this)">Copy</button></pre>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>2. ws-split</h3>
+            <span class="badge badge-secondary">Split Daemons</span>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted); margin-top:0.5rem;">
+            Routes <code>/ws*</code> path requests to a dedicated WebSocket port (8080) and all other traffic to an API server (9011).
+          </p>
+          <pre><code>npx caddy-template ws-split quotation.keshavsoft.com 9011 8080</code><button class="copy-btn" onclick="copyText('npx caddy-template ws-split quotation.keshavsoft.com 9011 8080', this)">Copy</button></pre>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>3. static</h3>
+            <span class="badge badge-teal">Direct Disk</span>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted); margin-top:0.5rem;">
+            High-performance static file serving via <code>vars.root</code> and native <code>file_server</code>.
+          </p>
+          <pre><code>npx caddy-template static cli.keshavsoft.com /usr/share/caddy/cli</code><button class="copy-btn" onclick="copyText('npx caddy-template static cli.keshavsoft.com /usr/share/caddy/cli', this)">Copy</button></pre>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>4. multi-host</h3>
+            <span class="badge badge-accent">Aliases</span>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted); margin-top:0.5rem;">
+            Binds apex domain and <code>www</code> subdomain to a single upstream target with automatic multi-cert issuance.
+          </p>
+          <pre><code>npx caddy-template multi-host keshavsoft.com,www.keshavsoft.com 9328</code><button class="copy-btn" onclick="copyText('npx caddy-template multi-host keshavsoft.com,www.keshavsoft.com 9328', this)">Copy</button></pre>
+        </div>
+      </div>
+
+      <h2><span>💻</span> Programmatic Node.js ESM Usage</h2>
+      <p>
+        In addition to the CLI, <code>caddy-template</code> exports pure JavaScript functions for integration into automation pipelines:
+      </p>
+
+      <pre><code>import { proxy, wsSplit, staticServer } from "caddy-template";
+
+// Generate a pristine AST object:
+const routeAST = proxy("appointment.keshavsoft.com", 3000);
+
+console.log(JSON.stringify(routeAST, null, 2));</code><button class="copy-btn" onclick="copyText('import { proxy, wsSplit, staticServer } from \"caddy-template\";\n\nconst routeAST = proxy(\"appointment.keshavsoft.com\", 3000);\nconsole.log(JSON.stringify(routeAST, null, 2));', this)">Copy</button></pre>
+
+      <div class="doc-footer-nav">
+        <a href="caddy-cli.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">caddy-cli (Fleet Inspector)</span>
+        </a>
+        <a href="caddy-subdomain.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">caddy-subdomain (Smoke Probes)</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

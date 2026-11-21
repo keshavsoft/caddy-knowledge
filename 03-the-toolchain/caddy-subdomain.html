@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>caddy-subdomain: Two-Stage Verification & Smoke Probes — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="../02-caddy-internals/index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="../02-caddy-internals/json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="../02-caddy-internals/reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="../02-caddy-internals/static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="../02-caddy-internals/admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="caddy-subdomain.html" class="active">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="../04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="../04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="../04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="../04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="../04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="../05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="../05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="../05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="../05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <a href="index.html">03 The Toolchain</a> &rsaquo;
+        <span class="current">caddy-subdomain</span>
+      </div>
+
+      <h1>caddy-subdomain: Two-Stage Verification & Smoke Probes</h1>
+      <p class="lead">
+        <strong>The Subdomain Lifecycle Engine:</strong> Eliminates connection guesswork by testing DNS and SSL with zero-dependency smoke probes before touching backend application code or ports.
+      </p>
+
+      <div class="upstream-banner">
+        <div class="upstream-banner-text">
+          <strong>Official Package & Repository:</strong> Published on npm and GitHub with full CLI & ESM library support.
+        </div>
+        <div>
+          <a href="https://www.npmjs.com/package/caddy-subdomain" target="_blank" class="upstream-banner-link">npm: caddy-subdomain ↗</a> &bull;
+          <a href="https://github.com/keshavsoft/caddy-subdomain" target="_blank" class="upstream-banner-link">github.com/keshavsoft/caddy-subdomain ↗</a>
+        </div>
+      </div>
+
+      <h2><span>🧭</span> The Problem It Solves</h2>
+      <p>
+        When configuring a new subdomain (e.g. <code>call.keshavsoft.com</code>), developers frequently configure DNS, Node.js ports, Caddy reverse proxies, and systemd services simultaneously. When the browser throws a connection error, it is impossible to know what failed:
+      </p>
+      <ul style="margin-left:1.5rem; color:var(--text-muted); margin-bottom:1.5rem;">
+        <li>Did GoDaddy DNS not propagate yet?</li>
+        <li>Did Let's Encrypt hit an ACME challenge timeout?</li>
+        <li>Did Node.js crash or fail to bind port 5000?</li>
+        <li>Is there an Ubuntu firewall or port collision issue?</li>
+      </ul>
+
+      <h2><span>⚡</span> The Two-Stage Solution</h2>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3>Level 1: The Smoke Test Probe (Zero Dependencies)</h3>
+          <span class="badge badge-warning">Zero Code / Zero Port</span>
+        </div>
+        <p style="font-size:0.92rem; color:var(--text-muted); margin-top:0.5rem;">
+          Injects an in-memory <code>static_response</code> handler into Caddy JSON returning HTTP 200 OK:
+        </p>
+        <pre><code>npx caddy-subdomain probe call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('npx caddy-subdomain probe call.keshavsoft.com', this)">Copy</button></pre>
+        <p style="font-size:0.88rem; color:var(--text-muted);">
+          Visit <code>https://call.keshavsoft.com</code>. If you see the green padlock and "200 OK", DNS and SSL are 100% verified. Node.js wasn't even touched!
+        </p>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h3>Level 2: Promote to Reverse Proxy</h3>
+          <span class="badge badge-accent">Live Production</span>
+        </div>
+        <p style="font-size:0.92rem; color:var(--text-muted); margin-top:0.5rem;">
+          Now that DNS and TLS are proven live, promote the route to dial your Node.js port:
+        </p>
+        <pre><code>npx caddy-subdomain add call.keshavsoft.com 5000</code><button class="copy-btn" onclick="copyText('npx caddy-subdomain add call.keshavsoft.com 5000', this)">Copy</button></pre>
+        <p style="font-size:0.88rem; color:var(--text-muted);">
+          Replaces the probe with <code>reverse_proxy</code> dialing <code>localhost:5000</code>. Existing SSL certificates remain active without re-negotiation.
+        </p>
+      </div>
+
+      <h2><span>📋</span> Command Reference</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Command</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>caddy-subdomain probe &lt;domain&gt;</code></td>
+            <td>Injects 200 OK smoke probe, reloads Caddy, and probes live HTTPS endpoint.</td>
+          </tr>
+          <tr>
+            <td><code>caddy-subdomain add &lt;domain&gt; &lt;port&gt;</code></td>
+            <td>Promotes domain to reverse proxy dialing internal port.</td>
+          </tr>
+          <tr>
+            <td><code>caddy-subdomain static &lt;domain&gt; &lt;root&gt;</code></td>
+            <td>Configures native file_server with vars.root document root.</td>
+          </tr>
+          <tr>
+            <td><code>caddy-subdomain check &lt;domain&gt;</code></td>
+            <td>Inspects domain presence in Caddy JSON and reports active handler type.</td>
+          </tr>
+          <tr>
+            <td><code>caddy-subdomain list</code></td>
+            <td>Lists all subdomains managed by Caddy.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="doc-footer-nav">
+        <a href="caddy-template.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">caddy-template (Route ASTs)</span>
+        </a>
+        <a href="caddy-fileserver.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">caddy-fileserver (Ubuntu Bridge)</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

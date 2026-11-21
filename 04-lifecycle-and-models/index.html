@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The 3-Stage VPS Subdomain Maturity Model — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="../02-caddy-internals/index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="../02-caddy-internals/json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="../02-caddy-internals/reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="../02-caddy-internals/static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="../02-caddy-internals/admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="../03-the-toolchain/index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="../03-the-toolchain/caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="../03-the-toolchain/caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="../03-the-toolchain/caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="../03-the-toolchain/caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html" class="active">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="../05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="../05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="../05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="../05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <span>04 Lifecycle & Models</span> &rsaquo;
+        <span class="current">3-Stage Maturity Model</span>
+      </div>
+
+      <h1>The 3-Stage VPS Subdomain Maturity Model</h1>
+      <p class="lead">
+        Never configure DNS, Node.js ports, Caddy routes, and SSL simultaneously. KeshavSoft decouples hosting into three progressive verification stages.
+      </p>
+
+      <h2><span>🧭</span> The Progression Pipeline</h2>
+
+      <div class="card" style="font-family:var(--font-mono); font-size:0.85rem; line-height:1.8;">
+        <div style="color:var(--text-muted);">// STEP 0: DNS Record at Domain Registrar</div>
+        <div>GoDaddy / DNS: <code>call ➔ 103.174.102.116</code></div>
+        <div style="margin-left:1.5rem; color:var(--text-muted);">&darr;</div>
+
+        <div style="color:var(--warning); font-weight:700;">1️⃣ STAGE 1: Smoke Probe (Zero Disk / Zero Code)</div>
+        <div><code>npx caddy-subdomain probe call.keshavsoft.com</code></div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">&bull; Verifies DNS propagation & Let's Encrypt TLS in memory (200 OK)</div>
+        <div style="margin-left:1.5rem; color:var(--text-muted);">&darr; Proven Live!</div>
+
+        <div style="color:var(--teal); font-weight:700;">2️⃣ STAGE 2: Static File Server (Disk Scaffolding & file_server)</div>
+        <div><code>npx caddy-fileserver init call.keshavsoft.com</code></div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">&bull; Scaffolds /usr/share/call.keshavsoft.com, starter HTML & static route</div>
+        <div style="margin-left:1.5rem; color:var(--text-muted);">&darr; Need Dynamic Node API?</div>
+
+        <div style="color:var(--accent); font-weight:700;">3️⃣ STAGE 3: Full Dynamic Backend Application</div>
+        <div><code>ubuntu-service-cli create & caddy-subdomain add call.keshavsoft.com 5000</code></div>
+        <div style="font-size:0.8rem; color:var(--text-muted);">&bull; Binds Node.js systemd service and promotes route to reverse_proxy</div>
+      </div>
+
+      <h2><span>🎯</span> Why Decoupling is Essential</h2>
+      <p>
+        By separating hosting into these distinct gates, when a problem occurs, the root cause is <strong>100% deterministic</strong>:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>If Failure Occurs At...</th>
+            <th>The Root Cause Is...</th>
+            <th>What is NOT Broken</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Stage 1 (Probe)</strong></td>
+            <td>DNS propagation delay, port 443 firewall, or Let's Encrypt rate limit.</td>
+            <td>Disk, code, and Node.js ports (they don't even exist yet!).</td>
+          </tr>
+          <tr>
+            <td><strong>Stage 2 (File Server)</strong></td>
+            <td>Linux file permissions on <code>/usr/share/</code> or missing index.html.</td>
+            <td>DNS and SSL (they were already proven in Stage 1).</td>
+          </tr>
+          <tr>
+            <td><strong>Stage 3 (Backend API)</strong></td>
+            <td>Node.js process crash or port collision (e.g. 502 Bad Gateway).</td>
+            <td>Network ingress and SSL certificates.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="doc-footer-nav">
+        <a href="../03-the-toolchain/caddy-fileserver.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">caddy-fileserver</span>
+        </a>
+        <a href="stage1-smoke-probe.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">Stage 1: Smoke Probe</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

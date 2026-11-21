@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Static File Server Handler — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="static-fileserver.html" class="active">📁 Static File Server Handler</a></li>
+        <li><a href="admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="../03-the-toolchain/index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="../03-the-toolchain/caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="../03-the-toolchain/caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="../03-the-toolchain/caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="../03-the-toolchain/caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="../04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="../04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="../04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="../04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="../04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="../05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="../05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="../05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="../05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <a href="index.html">02 Caddy Internals</a> &rsaquo;
+        <span class="current">Static File Server Handler</span>
+      </div>
+
+      <h1>Static File Server & vars.root Handler</h1>
+      <p class="lead">
+        How Caddy serves static assets directly from disk using kernel-level zero-copy transfers, and how the <code>vars.root</code> directive couples to the Ubuntu filesystem.
+      </p>
+
+      <div class="upstream-banner">
+        <div class="upstream-banner-text">
+          <strong>Official Upstream Reference:</strong> Upstream documentation on Caddy's <code>file_server</code> handler.
+        </div>
+        <a href="https://caddyserver.com/docs/modules/http.handlers.file_server" target="_blank" class="upstream-banner-link">caddyserver.com/docs/modules/http.handlers.file_server ↗</a>
+      </div>
+
+      <h2><span>⚡</span> High-Performance Zero-Copy Static Serving</h2>
+      <p>
+        For documentation portals, static marketing sites, and Single Page Applications (SPAs), running a Node.js process (e.g. Express with <code>express.static</code>) consumes unnecessary RAM and introduces memory leak risks.
+      </p>
+      <p>
+        Caddy's native <code>file_server</code> handler leverages Go's highly optimized <code>sendfile(2)</code> syscall. Files are streamed directly from the Linux filesystem cache into network buffers with zero intermediate memory copying.
+      </p>
+
+      <h2><span>🧩</span> Anatomy of a Caddy JSON Static Route</h2>
+      <p>
+        In native Caddy JSON, static file serving is implemented via a two-stage handler chain:
+      </p>
+
+      <pre><code>{
+  "match": [
+    {
+      "host": [
+        "cli.keshavsoft.com"
+      ]
+    }
+  ],
+  "handle": [
+    {
+      "handler": "vars",
+      "root": "/usr/share/caddy/cli"
+    },
+    {
+      "handler": "file_server",
+      "hide": [
+        ".git"
+      ]
+    }
+  ],
+  "terminal": true
+}</code><button class="copy-btn" onclick="copyText('{\n  \"match\": [\n    {\n      \"host\": [\n        \"cli.keshavsoft.com\"\n      ]\n    }\n  ],\n  \"handle\": [\n    {\n      \"handler\": \"vars\",\n      \"root\": \"/usr/share/caddy/cli\"\n    },\n    {\n      \"handler\": \"file_server\",\n      \"hide\": [\n        \".git\"\n      ]\n    }\n  ],\n  \"terminal\": true\n}', this)">Copy</button></pre>
+
+      <div class="grid-2">
+        <div class="card">
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+            <span class="badge badge-primary">Handler 1</span>
+            <h3 style="margin:0;">vars.root</h3>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted);">
+            Sets the context variable <code>{http.vars.root}</code> for all downstream handlers in this request pipeline. This binds the request to an absolute Ubuntu filesystem path like <code>/usr/share/&lt;domain&gt;</code>.
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+            <span class="badge badge-accent">Handler 2</span>
+            <h3 style="margin:0;">file_server</h3>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted);">
+            Sanitizes the URL path, resolves the file against <code>root</code>, negotiates compression (gzip/zstd), handles ETags and <code>If-None-Match</code> headers for 304 caching, and streams bytes to the browser.
+          </p>
+        </div>
+      </div>
+
+      <h2><span>📁</span> The KeshavSoft Ubuntu Directory Convention</h2>
+      <p>
+        To prevent random directory placement across VPS disks, KeshavSoft enforces a standard directory convention:
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Subdomain</th>
+            <th>Canonical Ubuntu Filesystem Root</th>
+            <th>Role</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>call.keshavsoft.com</code></td>
+            <td><code>/usr/share/call.keshavsoft.com</code></td>
+            <td>Live calling display SPA / static documentation</td>
+          </tr>
+          <tr>
+            <td><code>cli.keshavsoft.com</code></td>
+            <td><code>/usr/share/caddy/cli</code></td>
+            <td>Static documentation portal</td>
+          </tr>
+          <tr>
+            <td><code>caddy.keshavsoft.com</code></td>
+            <td><code>/usr/share/caddy.keshavsoft.com</code></td>
+            <td>Ecosystem portal build files</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-teal">
+        <div class="callout-title">Automated by caddy-fileserver</div>
+        You never have to manually run <code>mkdir</code>, write HTML templates, and edit JSON routes by hand. Running <code>npx caddy-fileserver init call.keshavsoft.com</code> handles this entire 5-step lifecycle in one command.
+      </div>
+
+      <div class="doc-footer-nav">
+        <a href="reverse-proxy-and-ws.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">Reverse Proxy & WebSockets</span>
+        </a>
+        <a href="admin-api-and-reloads.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">Zero-Downtime Reloads vs Systemd</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

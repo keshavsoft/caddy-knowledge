@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>caddy-fileserver: Ubuntu Filesystem Bridge — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="../02-caddy-internals/index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="../02-caddy-internals/json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="../02-caddy-internals/reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="../02-caddy-internals/static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="../02-caddy-internals/admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="caddy-fileserver.html" class="active">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="../04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="../04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="../04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="../04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="../04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="../05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="../05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="../05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="../05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <a href="index.html">03 The Toolchain</a> &rsaquo;
+        <span class="current">caddy-fileserver</span>
+      </div>
+
+      <h1>caddy-fileserver: Ubuntu Filesystem Bridge</h1>
+      <p class="lead">
+        <strong>The Missing Half of Static Cloud Hosting:</strong> Bridges Caddy's public TLS listener (:443) directly to the Ubuntu filesystem (<code>/usr/share/...</code>) with complete 5-step automation.
+      </p>
+
+      <div class="upstream-banner">
+        <div class="upstream-banner-text">
+          <strong>Official Package & Repository:</strong> Published on npm and GitHub with interactive browser catalog.
+        </div>
+        <div>
+          <a href="https://www.npmjs.com/package/caddy-fileserver" target="_blank" class="upstream-banner-link">npm: caddy-fileserver ↗</a> &bull;
+          <a href="https://github.com/keshavsoft/caddy-fileserver" target="_blank" class="upstream-banner-link">github.com/keshavsoft/caddy-fileserver ↗</a>
+        </div>
+      </div>
+
+      <h2><span>🌉</span> The Two Halves of Static Hosting</h2>
+      <p>
+        Static hosting on an Ubuntu VPS requires coordinating two separate environments:
+      </p>
+
+      <div class="card" style="font-family:var(--font-mono); font-size:0.85rem; line-height:1.7;">
+        <div>1. <strong>The Front-Door Gateway:</strong> <code>/etc/caddy/caddy.json</code> (TLS termination, SNI matching, file_server handler)</div>
+        <div style="margin-left:1.5rem; color:var(--text-muted);">&darr; <code>vars.root</code></div>
+        <div>2. <strong>The Ubuntu Filesystem:</strong> <code>/usr/share/&lt;domain&gt;</code> (Physical disk folder, HTML files, CSS, JS assets)</div>
+      </div>
+
+      <h2><span>⚡</span> The 5-in-1 Atomic Command: `init`</h2>
+      <p>
+        Instead of manually running <code>mkdir</code>, creating test HTML, editing Caddy JSON, reloading, and curling the domain, <code>caddy-fileserver init</code> executes all five operations atomically:
+      </p>
+
+      <pre><code>npx caddy-fileserver init call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('npx caddy-fileserver init call.keshavsoft.com', this)">Copy</button></pre>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4>What It Does Under the Hood:</h4>
+          <ol style="margin-left:1.25rem; font-size:0.88rem; color:var(--text-muted); line-height:1.7;">
+            <li>Creates directory <code>/usr/share/call.keshavsoft.com</code>.</li>
+            <li>Writes a modern, responsive starter <code>index.html</code>.</li>
+            <li>Generates an atomic backup: <code>caddy.json.bak.&lt;ts&gt;</code>.</li>
+            <li>Injects <code>vars.root</code> + <code>file_server</code> into Caddy JSON.</li>
+            <li>Triggers hot reload and probes live endpoint.</li>
+          </ol>
+        </div>
+
+        <div class="card">
+          <h4>Alignment Audit: `check`</h4>
+          <p style="font-size:0.88rem; color:var(--text-muted);">
+            Audits whether disk directories and Caddy JSON routes match:
+          </p>
+          <pre><code>npx caddy-fileserver check call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('npx caddy-fileserver check call.keshavsoft.com', this)">Copy</button></pre>
+          <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--teal);">
+            Disk Directory: Exists (/usr/share/call.keshavsoft.com)<br>
+            Caddy Route:    Aligned (vars.root + file_server)<br>
+            Status:         HEALTHY
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-footer-nav">
+        <a href="caddy-subdomain.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">caddy-subdomain (Smoke Probes)</span>
+        </a>
+        <a href="../04-lifecycle-and-models/index.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">04 Lifecycle & Models Overview</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

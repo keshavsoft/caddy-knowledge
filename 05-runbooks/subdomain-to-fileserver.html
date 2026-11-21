@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Runbook: Promoting call.keshavsoft.com to Static File Server — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="../02-caddy-internals/index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="../02-caddy-internals/json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="../02-caddy-internals/reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="../02-caddy-internals/static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="../02-caddy-internals/admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="../03-the-toolchain/index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="../03-the-toolchain/caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="../03-the-toolchain/caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="../03-the-toolchain/caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="../03-the-toolchain/caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="../04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="../04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="../04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="../04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="../04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html">📋 Runbook Index</a></li>
+        <li><a href="subdomain-to-fileserver.html" class="active">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <a href="index.html">05 Operator Runbooks</a> &rsaquo;
+        <span class="current">Promote call.keshavsoft.com</span>
+      </div>
+
+      <h1>Operator Runbook: Promoting call.keshavsoft.com</h1>
+      <p class="lead">
+        Step-by-step instructions to take <code>call.keshavsoft.com</code> from an unconfigured state or smoke probe to an active, production-grade static file server at <code>/usr/share/call.keshavsoft.com</code>.
+      </p>
+
+      <h2><span>🔍</span> Pre-Flight: Inspect Current Caddy State</h2>
+      <p>
+        Check the status of <code>call.keshavsoft.com</code> in the live Caddy configuration:
+      </p>
+      <pre><code>npx caddy-cli -d call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('npx caddy-cli -d call.keshavsoft.com', this)">Copy</button></pre>
+
+      <h2><span>⚡</span> The Fast Path: 1-Step Atomic Promotion</h2>
+      <p>
+        Execute the automated initialization command:
+      </p>
+      <pre><code>npx caddy-fileserver init call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('npx caddy-fileserver init call.keshavsoft.com', this)">Copy</button></pre>
+
+      <div class="card">
+        <h3>This single command automatically:</h3>
+        <ol style="margin-left:1.5rem; font-size:0.92rem; color:var(--text-muted); line-height:1.7;">
+          <li>Provisions the directory <code>/usr/share/call.keshavsoft.com</code>.</li>
+          <li>Generates a clean starter <code>index.html</code>.</li>
+          <li>Creates an atomic backup <code>/etc/caddy/caddy.json.bak.&lt;timestamp&gt;</code>.</li>
+          <li>Injects the Caddy JSON route block:
+            <pre style="margin-top:0.5rem;"><code>{
+  "match": [{ "host": ["call.keshavsoft.com"] }],
+  "handle": [
+    { "handler": "vars", "root": "/usr/share/call.keshavsoft.com" },
+    { "handler": "file_server", "hide": [".git"] }
+  ],
+  "terminal": true
+}</code></pre>
+          </li>
+          <li>Executes <code>caddy reload --config /etc/caddy/caddy.json</code> in memory without dropping existing WebSockets.</li>
+        </ol>
+      </div>
+
+      <h2><span>✅</span> Post-Flight Verification</h2>
+      <p>
+        Audit that the disk folder and route are fully synchronized:
+      </p>
+      <pre><code>npx caddy-fileserver check call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('npx caddy-fileserver check call.keshavsoft.com', this)">Copy</button></pre>
+
+      <p>
+        Test the public HTTPS endpoint:
+      </p>
+      <pre><code>curl -I https://call.keshavsoft.com</code><button class="copy-btn" onclick="copyText('curl -I https://call.keshavsoft.com', this)">Copy</button></pre>
+
+      <div class="callout callout-accent">
+        <div class="callout-title">Expected Output:</div>
+        <code>HTTP/2 200 OK</code><br>
+        <code>server: Caddy</code><br>
+        <code>content-type: text/html; charset=utf-8</code>
+      </div>
+
+      <div class="doc-footer-nav">
+        <a href="index.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">Runbook Index</span>
+        </a>
+        <a href="disaster-recovery-backups.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">Atomic Backups & Recovery</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

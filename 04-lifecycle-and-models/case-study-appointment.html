@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Study: appointment-notifier — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="../02-caddy-internals/index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="../02-caddy-internals/json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="../02-caddy-internals/reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="../02-caddy-internals/static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="../02-caddy-internals/admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="../03-the-toolchain/index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="../03-the-toolchain/caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="../03-the-toolchain/caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="../03-the-toolchain/caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="../03-the-toolchain/caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="case-study-appointment.html" class="active">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="../05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="../05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="../05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="../05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <a href="index.html">04 Lifecycle & Models</a> &rsaquo;
+        <span class="current">Case Study: appointment-notifier</span>
+      </div>
+
+      <h1>Case Study: appointment-notifier</h1>
+      <p class="lead">
+        A step-by-step code investigation walkthrough of KeshavSoft’s real-world clinic queue calling application, proving how to inspect application source code and select the exact Caddy configuration.
+      </p>
+
+      <div class="upstream-banner">
+        <div class="upstream-banner-text">
+          <strong>Production Application Repository:</strong> Live clinic calling audio/visual display application.
+        </div>
+        <a href="https://github.com/keshavsoft/appointment-notifier" target="_blank" class="upstream-banner-link">github.com/keshavsoft/appointment-notifier ↗</a>
+      </div>
+
+      <h2><span>🔬</span> The Code Investigation</h2>
+      <p>
+        When configuring Caddy for an existing application, never guess the routing requirements. Inspect the source code:
+      </p>
+
+      <div class="card">
+        <h3>Step 1: Inspect Server Listener (`app.js`)</h3>
+        <p style="font-size:0.9rem; color:var(--text-muted);">
+          Looking at <code>app.js</code> in <code>appointment-notifier</code>:
+        </p>
+        <pre><code>const server = http.createServer(app);
+const wss = new WebSocketServer({ server });
+
+server.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+});</code></pre>
+        <p style="font-size:0.88rem; color:var(--text-muted);">
+          <strong>Deduction:</strong> The HTTP server and WebSocket server share the <strong>exact same internal port (3000)</strong>. There is no separate WebSocket port.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Step 2: Inspect Frontend WebSocket Connection (`display.js`)</h3>
+        <p style="font-size:0.9rem; color:var(--text-muted);">
+          Looking at client-side JavaScript in <code>public/display.js</code>:
+        </p>
+        <pre><code>const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const socket = new WebSocket(`${protocol}//${window.location.host}/ws`);</code></pre>
+        <p style="font-size:0.88rem; color:var(--text-muted);">
+          <strong>Deduction:</strong> The frontend connects to standard port 443 via <code>wss://</code> on the <code>/ws</code> path.
+        </p>
+      </div>
+
+      <h2><span>⚖️</span> Selecting the Template: Why `proxy` Over `ws-split`</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Template Option</th>
+            <th>Suitability</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong><code>caddy-template proxy</code></strong></td>
+            <td><strong style="color:var(--accent);">✅ PERFECT MATCH</strong></td>
+            <td>HTTP and WebSockets share port 3000. Caddy automatically upgrades WebSocket connections on the single dial target.</td>
+          </tr>
+          <tr>
+            <td><strong><code>caddy-template ws-split</code></strong></td>
+            <td><strong style="color:var(--danger);">❌ WRONG</strong></td>
+            <td>Requires a second listening port (e.g. 8080). Since <code>appointment-notifier</code> only has port 3000, routing <code>/ws*</code> to a non-existent port causes immediate 502 errors!</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2><span>⚡</span> The Execution Command</h2>
+      <pre><code>npx caddy-template proxy appointment.keshavsoft.com 3000</code><button class="copy-btn" onclick="copyText('npx caddy-template proxy appointment.keshavsoft.com 3000', this)">Copy</button></pre>
+
+      <div class="doc-footer-nav">
+        <a href="stage3-dynamic-backend.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">Stage 3: Dynamic Node Backend</span>
+        </a>
+        <a href="../05-runbooks/index.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">05 Operator Runbooks</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

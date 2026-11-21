@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON AST Route Anatomy — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="json-ast-hierarchy.html" class="active">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="../03-the-toolchain/index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="../03-the-toolchain/caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="../03-the-toolchain/caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="../03-the-toolchain/caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="../03-the-toolchain/caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="../04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="../04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="../04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="../04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="../04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="../05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="../05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="../05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="../05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <a href="index.html">02 Caddy Internals</a> &rsaquo;
+        <span class="current">JSON AST Route Anatomy</span>
+      </div>
+
+      <h1>JSON AST Route Anatomy</h1>
+      <p class="lead">
+        A deep, layer-by-layer breakdown of the Caddy JSON Abstract Syntax Tree (AST). Understand how <code>apps.http.servers</code> parses incoming requests down to the exact handler.
+      </p>
+
+      <div class="upstream-banner">
+        <div class="upstream-banner-text">
+          <strong>Official Upstream Reference:</strong> Comprehensive schema definition for Caddy HTTP routes and matchers.
+        </div>
+        <a href="https://caddyserver.com/docs/json/apps/http/servers/routes/" target="_blank" class="upstream-banner-link">caddyserver.com/docs/json/apps/http/servers/routes/ ↗</a>
+      </div>
+
+      <h2><span>🌳</span> The 6-Level Hierarchy</h2>
+      <p>
+        Every production <code>/etc/caddy/caddy.json</code> file follows this exact hierarchy:
+      </p>
+
+      <div class="card" style="font-family:var(--font-mono); font-size:0.88rem;">
+        <span style="color:var(--primary);">apps</span><br>
+        &nbsp;&nbsp;└── <span style="color:var(--secondary);">http</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span style="color:var(--accent);">servers</span> ("srv0")<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span style="color:var(--teal);">listen</span>: [":443"]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span style="color:var(--warning);">routes</span>: [ &lt;Route 0&gt;, &lt;Route 1&gt;, ... &lt;Route N&gt; ]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span style="color:var(--primary);">match</span>: [{ "host": ["domain.com"] }]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span style="color:var(--secondary);">handle</span>: [{ "handler": "subroute", ... }]<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span style="color:var(--danger);">terminal</span>: true
+      </div>
+
+      <h2><span>🔬</span> Detailed Field Breakdown</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Property</th>
+            <th>Type</th>
+            <th>Plain-English Role</th>
+            <th>Production Impact</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>match.host</code></td>
+            <td><code>string[]</code></td>
+            <td>The SNI hostname(s) this route accepts.</td>
+            <td>Caddy issues Let's Encrypt certificates for every host in this list.</td>
+          </tr>
+          <tr>
+            <td><code>handle[].handler</code></td>
+            <td><code>string</code></td>
+            <td>The root middleware dispatcher.</td>
+            <td>Typically <code>"subroute"</code>, allowing multiple child route evaluations.</td>
+          </tr>
+          <tr>
+            <td><code>handle[].routes</code></td>
+            <td><code>Route[]</code></td>
+            <td>Array of inner pipeline handlers.</td>
+            <td>Where path-level matchers (e.g. <code>/ws*</code>) or static response handlers live.</td>
+          </tr>
+          <tr>
+            <td><code>upstreams[].dial</code></td>
+            <td><code>string</code></td>
+            <td>The backend target address:port.</td>
+            <td>Specifies where reverse proxy traffic is routed (e.g. <code>"localhost:3000"</code>).</td>
+          </tr>
+          <tr>
+            <td><code>terminal</code></td>
+            <td><code>boolean</code></td>
+            <td>Stops route evaluation.</td>
+            <td>Always set to <code>true</code> so requests that match do not fall through to default fallback handlers.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2><span>📄</span> A Real-World KeshavSoft Route Object</h2>
+      <p>
+        Here is the pristine route AST generated by <code>caddy-template proxy appointment.keshavsoft.com 3000</code>:
+      </p>
+
+      <pre><code>{
+  "match": [
+    {
+      "host": [
+        "appointment.keshavsoft.com"
+      ]
+    }
+  ],
+  "handle": [
+    {
+      "handler": "subroute",
+      "routes": [
+        {
+          "handle": [
+            {
+              "handler": "reverse_proxy",
+              "upstreams": [
+                {
+                  "dial": "localhost:3000"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "terminal": true
+}</code><button class="copy-btn" onclick="copyText('{\n  \"match\": [\n    {\n      \"host\": [\n        \"appointment.keshavsoft.com\"\n      ]\n    }\n  ],\n  \"handle\": [\n    {\n      \"handler\": \"subroute\",\n      \"routes\": [\n        {\n          \"handle\": [\n            {\n              \"handler\": \"reverse_proxy\",\n              \"upstreams\": [\n                {\n                  \"dial\": \"localhost:3000\"\n                }\n              ]\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"terminal\": true\n}', this)">Copy</button></pre>
+
+      <div class="callout callout-accent">
+        <div class="callout-title">AST Order Matters</div>
+        In Caddy, routes are evaluated in the order they appear in the <code>routes</code> array. Specific subroutes with path matchers (e.g. <code>/api/*</code> or <code>/ws*</code>) must be placed before catch-all wildcards.
+      </div>
+
+      <div class="doc-footer-nav">
+        <a href="index.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">Caddy Internals Overview</span>
+        </a>
+        <a href="reverse-proxy-and-ws.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">Reverse Proxy & WebSockets</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

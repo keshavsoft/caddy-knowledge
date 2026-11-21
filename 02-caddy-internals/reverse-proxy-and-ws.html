@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reverse Proxy & Native WebSocket Tunneling — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="reverse-proxy-and-ws.html" class="active">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="../03-the-toolchain/index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="../03-the-toolchain/caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="../03-the-toolchain/caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="../03-the-toolchain/caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="../03-the-toolchain/caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="../04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="../04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="../04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="../04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="../04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="../05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="../05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="../05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="../05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <a href="index.html">02 Caddy Internals</a> &rsaquo;
+        <span class="current">Reverse Proxy & WebSockets</span>
+      </div>
+
+      <h1>Reverse Proxy & Native WebSocket Tunneling</h1>
+      <p class="lead">
+        How Caddy handles upstream dial targets, and why Caddy's native bidirectional HTTP/1.1 upgrade tunneling completely eliminates legacy reverse proxy configuration headaches.
+      </p>
+
+      <div class="upstream-banner">
+        <div class="upstream-banner-text">
+          <strong>Official Upstream Reference:</strong> Official documentation on Caddy's <code>reverse_proxy</code> handler module.
+        </div>
+        <a href="https://caddyserver.com/docs/modules/http.handlers.reverse_proxy" target="_blank" class="upstream-banner-link">caddyserver.com/docs/modules/http.handlers.reverse_proxy ↗</a>
+      </div>
+
+      <h2><span>🔄</span> Automatic WebSocket Upgrades</h2>
+      <p>
+        In older reverse proxies like Nginx, handling WebSockets requires configuring multiple explicit proxy headers:
+      </p>
+      <pre><code># The old, tedious Nginx way:
+proxy_set_header Upgrade $http_upgrade;
+proxy_set_header Connection "upgrade";
+proxy_http_version 1.1;</code></pre>
+
+      <p>
+        In Caddy, <strong>WebSocket proxying is 100% native and automatic</strong>. When a client sends an HTTP request with:
+      </p>
+      <pre><code>Upgrade: websocket
+Connection: Upgrade</code></pre>
+
+      <p>
+        Caddy inspects the headers, passes them to the upstream dial target, and hijacks the TCP connection into a full-duplex byte stream. No special flags, headers, or directives are required in your Caddy JSON route.
+      </p>
+
+      <h2><span>📐</span> The Two Architectural Patterns</h2>
+
+      <div class="grid-2">
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <h3>Pattern A: Unified Port Proxy</h3>
+            <span class="badge badge-primary">Most Common</span>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted);">
+            The backend application (like Express + <code>ws</code> or Socket.io) listens on a <strong>single port</strong> (e.g. <code>3000</code>). HTTP requests and WebSocket connections both hit <code>localhost:3000</code>.
+          </p>
+          <div style="font-family:var(--font-mono); font-size:0.8rem; background:var(--code-bg); padding:0.75rem; border-radius:6px; margin:0.75rem 0;">
+            Browser (HTTPS/WSS) ──► :443 Caddy ──► :3000 Node.js
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-muted);">
+            Generate with: <code>npx caddy-template proxy domain 3000</code>
+          </p>
+        </div>
+
+        <div class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <h3>Pattern B: Dual-Target Split Proxy</h3>
+            <span class="badge badge-secondary">Split Daemons</span>
+          </div>
+          <p style="font-size:0.9rem; color:var(--text-muted);">
+            REST API runs on Port A (e.g. <code>9011</code>), while an isolated high-throughput WebSocket daemon runs on Port B (e.g. <code>8080</code>). Caddy splits traffic based on URL path.
+          </p>
+          <div style="font-family:var(--font-mono); font-size:0.8rem; background:var(--code-bg); padding:0.75rem; border-radius:6px; margin:0.75rem 0;">
+            Browser ──► Caddy ──┬── /ws* ──► :8080 (WS)<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── * ────► :9011 (API)
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-muted);">
+            Generate with: <code>npx caddy-template ws-split domain 9011 8080</code>
+          </p>
+        </div>
+      </div>
+
+      <h2><span>🛑</span> Why Active WebSockets Stay Alive Across Reloads</h2>
+      <p>
+        When you add or update routes and run:
+      </p>
+      <pre><code>caddy reload --config /etc/caddy/caddy.json</code><button class="copy-btn" onclick="copyText('caddy reload --config /etc/caddy/caddy.json', this)">Copy</button></pre>
+      <p>
+        Caddy's runtime re-initializes only the affected route paths. Existing active WebSocket streams continue running uninterrupted on the established TCP tunnel. This prevents hospital queue displays, appointment calling screens, or trading interfaces from blinking or dropping out during server config updates.
+      </p>
+
+      <div class="doc-footer-nav">
+        <a href="json-ast-hierarchy.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">JSON AST Route Anatomy</span>
+        </a>
+        <a href="static-fileserver.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">Static File Server Handler</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

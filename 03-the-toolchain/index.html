@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The KeshavSoft Caddy Toolchain — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="../02-caddy-internals/index.html">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="../02-caddy-internals/json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="../02-caddy-internals/reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="../02-caddy-internals/static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="../02-caddy-internals/admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html" class="active">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="../04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="../04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="../04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="../04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="../04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="../05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="../05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="../05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="../05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <span>03 The Toolchain</span> &rsaquo;
+        <span class="current">Synergy Overview</span>
+      </div>
+
+      <h1>The KeshavSoft Caddy JSON Toolchain</h1>
+      <p class="lead">
+        Instead of maintaining a massive monolithic CLI or fragile text bash scripts, KeshavSoft split Caddy cloud operations into four specialized, complementary micro-tools.
+      </p>
+
+      <h2><span>🧩</span> How the Four Repositories Complement Each Other</h2>
+
+      <div class="card" style="font-family:var(--font-mono); font-size:0.85rem; line-height:1.7;">
+        <div style="text-align:center; margin-bottom:1rem; font-weight:700; color:var(--primary);">
+          [ Production Ubuntu VPS Fleet: /etc/caddy/caddy.json ]
+        </div>
+        <div style="display:flex; justify-content:space-around; flex-wrap:wrap; gap:1rem;">
+          <div style="border:1px solid var(--primary); padding:0.75rem 1rem; border-radius:8px; flex:1; min-width:200px;">
+            <div style="color:var(--primary); font-weight:700;">caddy-cli</div>
+            <div style="color:var(--text-muted); font-size:0.8rem;">Read & Audit Lens</div>
+            <div>&bull; Port mapping table (-p)</div>
+            <div>&bull; Domain inspector (-d)</div>
+          </div>
+          <div style="border:1px solid var(--secondary); padding:0.75rem 1rem; border-radius:8px; flex:1; min-width:200px;">
+            <div style="color:var(--secondary); font-weight:700;">caddy-template</div>
+            <div style="color:var(--text-muted); font-size:0.8rem;">Route AST Generator</div>
+            <div>&bull; proxy (single port)</div>
+            <div>&bull; ws-split (dual-port)</div>
+            <div>&bull; static & multi-host</div>
+          </div>
+          <div style="border:1px solid var(--accent); padding:0.75rem 1rem; border-radius:8px; flex:1; min-width:200px;">
+            <div style="color:var(--accent); font-weight:700;">caddy-subdomain</div>
+            <div style="color:var(--text-muted); font-size:0.8rem;">Lifecycle & Probes</div>
+            <div>&bull; probe (DNS/SSL check)</div>
+            <div>&bull; add (promote to reverse proxy)</div>
+          </div>
+          <div style="border:1px solid var(--teal); padding:0.75rem 1rem; border-radius:8px; flex:1; min-width:200px;">
+            <div style="color:var(--teal); font-weight:700;">caddy-fileserver</div>
+            <div style="color:var(--text-muted); font-size:0.8rem;">Filesystem Bridge</div>
+            <div>&bull; /usr/share/&lt;domain&gt;</div>
+            <div>&bull; init starter HTML</div>
+            <div>&bull; file_server routes</div>
+          </div>
+        </div>
+      </div>
+
+      <h2><span>📋</span> The 4 Tool Responsibilities</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tool Name</th>
+            <th>Primary Responsibility</th>
+            <th>Canonical NPX Invocation</th>
+            <th>GitHub Repository</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong><code>caddy-cli</code></strong></td>
+            <td>Human observability, fleet port allocation, route inspection</td>
+            <td><code>npx caddy-cli -p</code></td>
+            <td><a href="https://github.com/keshavsoft/caddy-cli" target="_blank" style="color:var(--primary);">keshavsoft/caddy-cli ↗</a></td>
+          </tr>
+          <tr>
+            <td><strong><code>caddy-template</code></strong></td>
+            <td>Pure AST route blueprint emission for common server patterns</td>
+            <td><code>npx caddy-template proxy &lt;host&gt; &lt;port&gt;</code></td>
+            <td><a href="https://github.com/keshavsoft/caddy-template" target="_blank" style="color:var(--secondary);">keshavsoft/caddy-template ↗</a></td>
+          </tr>
+          <tr>
+            <td><strong><code>caddy-subdomain</code></strong></td>
+            <td>Level-1 zero-dependency smoke test probes & route promotion</td>
+            <td><code>npx caddy-subdomain probe &lt;host&gt;</code></td>
+            <td><a href="https://github.com/keshavsoft/caddy-subdomain" target="_blank" style="color:var(--accent);">keshavsoft/caddy-subdomain ↗</a></td>
+          </tr>
+          <tr>
+            <td><strong><code>caddy-fileserver</code></strong></td>
+            <td>Disk scaffolding, starter templates, and Caddy file_server bridge</td>
+            <td><code>npx caddy-fileserver init &lt;host&gt;</code></td>
+            <td><a href="https://github.com/keshavsoft/caddy-fileserver" target="_blank" style="color:var(--teal);">keshavsoft/caddy-fileserver ↗</a></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2><span>⚡</span> The Typical Operator Journey</h2>
+      <ol style="margin-left:1.5rem; color:var(--text-muted); line-height:1.8; margin-bottom:2rem;">
+        <li><strong>Step 1 (Find Free Port):</strong> Run <code>npx caddy-cli -p</code> to check all ports currently occupied by Caddy routes and find an open slot (e.g. <code>3000</code>).</li>
+        <li><strong>Step 2 (Verify DNS & TLS):</strong> Run <code>npx caddy-subdomain probe new.keshavsoft.com</code> to verify the domain resolves and gets a green HTTPS padlock without starting any app code.</li>
+        <li><strong>Step 3 (Deploy & Promote):</strong>
+          <ul style="margin-left:1.25rem;">
+            <li>If static: run <code>npx caddy-fileserver init new.keshavsoft.com</code> to scaffold <code>/usr/share/new.keshavsoft.com</code> and wire static serving.</li>
+            <li>If dynamic Node.js: run <code>npx caddy-subdomain add new.keshavsoft.com 3000</code> to promote the route to dial the backend service.</li>
+          </ul>
+        </li>
+      </ol>
+
+      <div class="doc-footer-nav">
+        <a href="../02-caddy-internals/admin-api-and-reloads.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">Zero-Downtime Reloads vs Systemd</span>
+        </a>
+        <a href="caddy-cli.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">caddy-cli: Fleet Inspector</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>

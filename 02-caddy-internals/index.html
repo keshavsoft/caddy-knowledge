@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caddy Internals & Architecture Map — Caddy Knowledge Base</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <a href="../index.html" class="brand">
+      <span class="brand-icon">🛡️</span>
+      <div>
+        <span class="brand-title">Caddy Knowledge Base</span>
+        <span class="brand-badge">Master Suite</span>
+      </div>
+    </a>
+    <div class="header-actions">
+      <input type="text" id="doc-search" class="search-input" placeholder="Search knowledge..." oninput="filterContent(this.value)">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Theme">🌓 Theme</button>
+      <a href="https://github.com/keshavsoft/caddy-knowledge" target="_blank" class="btn-link">GitHub ↗</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-section-title">Overview</div>
+      <ul class="sidebar-nav">
+        <li><a href="../index.html">🏠 Knowledge Base Home</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">01 The Story & Paradigms</div>
+      <ul class="sidebar-nav">
+        <li><a href="../01-the-story/index.html">📖 The Dual Paradigms Overview</a></li>
+        <li><a href="../01-the-story/caddyfile-adapter.html">📄 Paradigm 1: Caddyfile Adapter</a></li>
+        <li><a href="../01-the-story/native-json-paradigm.html">⚙️ Paradigm 2: Native Caddy JSON</a></li>
+        <li><a href="../01-the-story/why-we-built-tools.html">🛠️ Why We Built Tools on JSON</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">02 Caddy Internals</div>
+      <ul class="sidebar-nav">
+        <li><a href="index.html" class="active">🗺️ Upstream Architecture Map</a></li>
+        <li><a href="json-ast-hierarchy.html">🌳 JSON AST Route Anatomy</a></li>
+        <li><a href="reverse-proxy-and-ws.html">🔄 Reverse Proxy & WebSockets</a></li>
+        <li><a href="static-fileserver.html">📁 Static File Server Handler</a></li>
+        <li><a href="admin-api-and-reloads.html">⚡ Zero-Downtime Reloads vs Systemd</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">03 The KeshavSoft Toolchain</div>
+      <ul class="sidebar-nav">
+        <li><a href="../03-the-toolchain/index.html">🧩 Toolchain Synergy Overview</a></li>
+        <li><a href="../03-the-toolchain/caddy-cli.html">🔍 caddy-cli (Fleet Inspector)</a></li>
+        <li><a href="../03-the-toolchain/caddy-template.html">📐 caddy-template (Route ASTs)</a></li>
+        <li><a href="../03-the-toolchain/caddy-subdomain.html">🚀 caddy-subdomain (Smoke Probes)</a></li>
+        <li><a href="../03-the-toolchain/caddy-fileserver.html">📂 caddy-fileserver (Ubuntu Bridge)</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">04 Lifecycle & Models</div>
+      <ul class="sidebar-nav">
+        <li><a href="../04-lifecycle-and-models/index.html">🧭 3-Stage Maturity Model</a></li>
+        <li><a href="../04-lifecycle-and-models/stage1-smoke-probe.html">1️⃣ Stage 1: Smoke Probe</a></li>
+        <li><a href="../04-lifecycle-and-models/stage2-static-fileserver.html">2️⃣ Stage 2: Static File Server</a></li>
+        <li><a href="../04-lifecycle-and-models/stage3-dynamic-backend.html">3️⃣ Stage 3: Dynamic Node Backend</a></li>
+        <li><a href="../04-lifecycle-and-models/case-study-appointment.html">🏥 Case Study: appointment-notifier</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">05 Operator Runbooks</div>
+      <ul class="sidebar-nav">
+        <li><a href="../05-runbooks/index.html">📋 Runbook Index</a></li>
+        <li><a href="../05-runbooks/subdomain-to-fileserver.html">🚀 Promote call.keshavsoft.com</a></li>
+        <li><a href="../05-runbooks/disaster-recovery-backups.html">💾 Atomic Backups & Recovery</a></li>
+        <li><a href="../05-runbooks/troubleshooting-502-and-ports.html">🚨 502 Bad Gateway & Port Conflicts</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <div class="breadcrumbs">
+        <a href="../index.html">Home</a> &rsaquo;
+        <span>02 Caddy Internals</span> &rsaquo;
+        <span class="current">Upstream Architecture Map</span>
+      </div>
+
+      <h1>Caddy Internals & Upstream Architecture Map</h1>
+      <p class="lead">
+        We do not reinvent or re-explain what Caddy already documents. We link directly to official upstream Caddy documentation and show how our JSON architecture and tools map cleanly to native Caddy modules.
+      </p>
+
+      <div class="upstream-banner">
+        <div class="upstream-banner-text">
+          <strong>Official Upstream Authority:</strong> The primary architecture documentation at Caddyserver.
+        </div>
+        <a href="https://caddyserver.com/docs/architecture" target="_blank" class="upstream-banner-link">caddyserver.com/docs/architecture ↗</a>
+      </div>
+
+      <h2><span>🌐</span> Official Upstream Deep-Link Index</h2>
+      <p>
+        Always consult official Caddy documentation for canonical protocol specifications and module definitions:
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Caddy Module / Concept</th>
+            <th>Upstream Official Documentation Link</th>
+            <th>KeshavSoft Component Mapping</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Caddy JSON Architecture</strong></td>
+            <td><a href="https://caddyserver.com/docs/json/" target="_blank" style="color:var(--primary);">caddyserver.com/docs/json/</a></td>
+            <td>The single source of truth for <code>/etc/caddy/caddy.json</code></td>
+          </tr>
+          <tr>
+            <td><strong>Reverse Proxy Handler</strong></td>
+            <td><a href="https://caddyserver.com/docs/modules/http.handlers.reverse_proxy" target="_blank" style="color:var(--primary);">caddyserver.com/.../reverse_proxy</a></td>
+            <td><code>caddy-template proxy</code> & <code>caddy-subdomain add</code></td>
+          </tr>
+          <tr>
+            <td><strong>Subroute Handler</strong></td>
+            <td><a href="https://caddyserver.com/docs/modules/http.handlers.subroute" target="_blank" style="color:var(--primary);">caddyserver.com/.../subroute</a></td>
+            <td><code>caddy-template ws-split</code> (/ws* and * splits)</td>
+          </tr>
+          <tr>
+            <td><strong>Static File Server</strong></td>
+            <td><a href="https://caddyserver.com/docs/modules/http.handlers.file_server" target="_blank" style="color:var(--primary);">caddyserver.com/.../file_server</a></td>
+            <td><code>caddy-fileserver</code> (<code>/usr/share/&lt;domain&gt;</code>)</td>
+          </tr>
+          <tr>
+            <td><strong>Static Response Handler</strong></td>
+            <td><a href="https://caddyserver.com/docs/modules/http.handlers.static_response" target="_blank" style="color:var(--primary);">caddyserver.com/.../static_response</a></td>
+            <td><code>caddy-subdomain probe</code> (Zero-disk 200 OK test)</td>
+          </tr>
+          <tr>
+            <td><strong>Host Matcher</strong></td>
+            <td><a href="https://caddyserver.com/docs/modules/http.matchers.host" target="_blank" style="color:var(--primary);">caddyserver.com/.../matchers/host</a></td>
+            <td><code>caddy-cli -u</code> and multi-host alias matching</td>
+          </tr>
+          <tr>
+            <td><strong>Admin API & Config Loader</strong></td>
+            <td><a href="https://caddyserver.com/docs/api" target="_blank" style="color:var(--primary);">caddyserver.com/docs/api</a></td>
+            <td>Zero-downtime hot reloads on port 2019</td>
+          </tr>
+          <tr>
+            <td><strong>Automatic HTTPS & ACME</strong></td>
+            <td><a href="https://caddyserver.com/docs/automatic-https" target="_blank" style="color:var(--primary);">caddyserver.com/docs/automatic-https</a></td>
+            <td>Automatic Let's Encrypt TLS certificate lifecycle</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2><span>🧩</span> Caddy’s Core Module Pipeline</h2>
+      <p>
+        Every incoming request on the KeshavSoft VPS fleet flows through this hierarchy:
+      </p>
+
+      <div class="card" style="font-family:var(--font-mono); font-size:0.88rem; line-height:1.7;">
+        <div>1. <strong>Listener (:443)</strong> &mdash; Terminates TLS via Automatic HTTPS certificate manager</div>
+        <div style="margin-left:1.5rem; color:var(--text-muted);">&darr;</div>
+        <div>2. <strong>Route Matching</strong> &mdash; Matches request against <code>match.host: ["subdomain.keshavsoft.com"]</code></div>
+        <div style="margin-left:1.5rem; color:var(--text-muted);">&darr;</div>
+        <div>3. <strong>Subroute Execution</strong> &mdash; Evaluates path-specific matchers (e.g. <code>/ws*</code> vs <code>*</code>)</div>
+        <div style="margin-left:1.5rem; color:var(--text-muted);">&darr;</div>
+        <div>4. <strong>Handler Execution</strong> &mdash; Dispatches to one of three handlers:</div>
+        <div style="margin-left:2.5rem; color:var(--teal);">&bull; <code>reverse_proxy</code> &rarr; dials upstream port (e.g. <code>localhost:3000</code>)</div>
+        <div style="margin-left:2.5rem; color:var(--accent);">&bull; <code>file_server</code> &rarr; serves static assets from <code>vars.root</code></div>
+        <div style="margin-left:2.5rem; color:var(--warning);">&bull; <code>static_response</code> &rarr; returns in-memory HTTP 200 OK (smoke probe)</div>
+      </div>
+
+      <h2><span>🧭</span> Deep Dive into Caddy Internals</h2>
+      <div class="grid-2">
+        <a href="json-ast-hierarchy.html" class="card card-interactive" style="text-decoration:none; color:inherit;">
+          <h4 style="color:var(--primary); margin-bottom:0.5rem;">JSON AST Route Anatomy &rarr;</h4>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Explore the complete tree from <code>apps.http.servers</code> down to upstreams and dial targets.</p>
+        </a>
+        <a href="reverse-proxy-and-ws.html" class="card card-interactive" style="text-decoration:none; color:inherit;">
+          <h4 style="color:var(--teal); margin-bottom:0.5rem;">Reverse Proxy & WebSockets &rarr;</h4>
+          <p style="font-size:0.85rem; color:var(--text-muted);">How Caddy transparently upgrades HTTP connections into persistent WebSocket streaming tunnels.</p>
+        </a>
+        <a href="static-fileserver.html" class="card card-interactive" style="text-decoration:none; color:inherit;">
+          <h4 style="color:var(--accent); margin-bottom:0.5rem;">Static File Server Handler &rarr;</h4>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Zero-copy kernel file delivery via <code>vars.root</code> and <code>file_server</code> with automated MIME types.</p>
+        </a>
+        <a href="admin-api-and-reloads.html" class="card card-interactive" style="text-decoration:none; color:inherit;">
+          <h4 style="color:var(--secondary); margin-bottom:0.5rem;">Zero-Downtime Reloads vs Systemd &rarr;</h4>
+          <p style="font-size:0.85rem; color:var(--text-muted);">Why running <code>systemctl restart caddy</code> is dangerous, and how in-memory reloads protect active sockets.</p>
+        </a>
+      </div>
+
+      <div class="doc-footer-nav">
+        <a href="../01-the-story/why-we-built-tools.html" class="doc-footer-btn">
+          <span class="label">&larr; Previous</span>
+          <span class="title">Why We Built Tools on JSON</span>
+        </a>
+        <a href="json-ast-hierarchy.html" class="doc-footer-btn" style="text-align:right;">
+          <span class="label">Next &rarr;</span>
+          <span class="title">JSON AST Route Anatomy</span>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/main.js"></script>
+</body>
+</html>
